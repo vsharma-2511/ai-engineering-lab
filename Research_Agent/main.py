@@ -1,6 +1,8 @@
 from src.config.settings import settings
 from src.planning.decomposer import decompose_query
 from src.planning.planner import build_dag_plan
+from src.planning.executor import DAGExecutor
+from src.synthesis.synthesizer import Synthesizer
 
 
 def main():
@@ -30,7 +32,36 @@ def main():
             f"| Domain: {node.task.target_domain} | Mode: {parallel_flag}"
         )
 
-    print("\n✨ Phase 1 Complete! Ready for Phase 2 Tool Execution.\n")
+    # 4. Phase 3 & 2: Dynamic Execution of the DAG via Workers
+    print("\n⏳ Running Phase 3 & 2: Executing DAG Tasks with ReAct Workers...")
+    executor = DAGExecutor(max_workers=2)
+    execution_output = executor.execute_dag(dag_plan)
+
+    # 5. Phase 4: Final Synthesis
+    print("\n⏳ Running Phase 4: Report Synthesis...")
+    synthesizer = Synthesizer()
+    report = synthesizer.synthesize(user_query, execution_plan, execution_output)
+
+    # 6. Display Final Formatted Report
+    print("\n" + "=" * 70)
+    print(f"📊 {report.title.upper()}")
+    print("=" * 70)
+
+    print("\n📌 EXECUTIVE SUMMARY")
+    print(report.executive_summary)
+
+    print("\n📈 KEY METRICS")
+    for metric in report.key_metrics:
+        print(f" • {metric.metric_name}: {metric.value} ({metric.context})")
+
+    print("\n📝 DETAILED ANALYSIS")
+    print(report.detailed_analysis)
+
+    print("\n🔗 CITED SOURCES")
+    for src in report.sources:
+        print(f" • [{src.source_title}]({src.url})")
+
+    print("\n✨ Pipeline execution complete! Phases 1 through 4 operational.\n")
 
 
 if __name__ == "__main__":

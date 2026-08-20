@@ -1,6 +1,6 @@
 from typing import List
 from pydantic import BaseModel, Field
-from src.schemas.query_schema import ExecutionPlan, SubTask
+from Research_Agent.src.schemas.query_schema import ExecutionPlan, SubTask
 
 
 class TaskNode(BaseModel):
