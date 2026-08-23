@@ -1,5 +1,11 @@
+from enum import Enum
 from typing import List, Optional
 from pydantic import BaseModel, Field
+
+
+class TaskType(str, Enum):
+    DATA_RETRIEVAL = "DATA_RETRIEVAL"
+    SYNTHESIS_COMPARISON = "SYNTHESIS_COMPARISON"
 
 
 class SearchParameters(BaseModel):
@@ -23,15 +29,24 @@ class SubTask(BaseModel):
         description="Unique identifier for the sub-task, e.g., 'TASK_1'"
     )
     sub_query: str = Field(
-        description="A focused, self-contained search query string"
+        description="A focused, self-contained search query string or comparison instruction"
     )
-    target_domain: str = Field(
-        description="The primary domain to restrict the search to"
+    target_domain: Optional[str] = Field(
+        default="",
+        description="The primary domain to restrict search to (optional for comparison tasks)"
+    )
+    task_type: TaskType = Field(
+        default=TaskType.DATA_RETRIEVAL,
+        description="Type of task: DATA_RETRIEVAL for fetching evidence, or SYNTHESIS_COMPARISON for cross-entity evaluation"
+    )
+    depends_on: List[str] = Field(
+        default_factory=list,
+        description="List of task_ids that must complete before this task can execute"
     )
 
 
 class ExecutionPlan(BaseModel):
     extracted_params: SearchParameters
     sub_tasks: List[SubTask] = Field(
-        description="Breakdown of the user query into individual, single-focus sub-queries for downstream tools"
+        description="Breakdown of the user query into individual sub-tasks, including data retrieval and comparative synthesis steps"
     )

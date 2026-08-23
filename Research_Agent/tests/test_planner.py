@@ -9,8 +9,16 @@ from Research_Agent.src.planning.planner import build_dag_plan
 
 def test_end_to_end_planning():
     # Sample complex query
-    user_query = "Find the total annual revenue of Apple for the most recent fiscal year, calculate its average per-month revenue from that figure, and then compare that monthly average to the total monthly revenue of a direct competitor like Microsoft."
+    # user_query = "Find the total annual revenue of Apple for the most recent fiscal year, calculate its average per-month revenue from that figure, and then compare that monthly average to the total monthly revenue of a direct competitor like Microsoft."
+    # user_query = (
+    #     "Compare the unemployment rate and average home prices between "
+    #     "Toronto and Vancouver from 2022 to 2025."
+    # )
 
+    user_query = (
+        "Compare the unemployment rate of "
+        "Toronto and Vancouver in 2026."
+    )
     print("=" * 60)
     print(f"🧪 [End-to-End Planning Test] Query: '{user_query}'")
     print("=" * 60)

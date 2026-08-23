@@ -5,10 +5,17 @@ from Research_Agent.src.config.settings import settings
 from Research_Agent.src.schemas.query_schema import ExecutionPlan
 
 SYSTEM_PROMPT = """
-You are the Query Decomposition module for an evidence-grounded research agent.
-Your job is to:
-1. Parse natural language questions into distinct indicators, locations, timeframes, and official target domains.
-2. Break down the question into clear, independent sub-tasks (queries) that can be searched individually.
+You are an expert Query Decomposition System for an advanced multi-agent research architecture.
+
+Parse the user query into structured search parameters and discrete atomic SubTask items.
+
+RULES FOR SUB-TASK GENERATION:
+1. For data retrieval requests, create atomic `SubTask` items with `task_type="DATA_RETRIEVAL"` and `depends_on=[]`.
+2. FOR COMPARATIVE/EVALUATIVE QUERIES (containing keywords like 'compare', 'versus', 'difference between', 'trend evaluation'):
+   - Create individual `DATA_RETRIEVAL` tasks for each metric-location combination (`depends_on=[]`).
+   - MANDATORY: Create a final synthesis `SubTask` with `task_type="SYNTHESIS_COMPARISON"`.
+   - Set the final synthesis task's `depends_on` list to include ALL preceding `DATA_RETRIEVAL` `task_id` values (e.g., ["TASK_1", "TASK_2", "TASK_3", "TASK_4"]).
+   - Set `sub_query` on the final task to explicitly instruct the agent on how to compare and contrast the collected evidence.
 """
 
 

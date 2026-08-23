@@ -1,5 +1,5 @@
 import concurrent.futures
-from typing import Any, Dict, List, Optional, Set, Union
+from typing import Any, Dict, List, Optional, Set
 
 from Research_Agent.src.agents.research_agent import ResearchAgent
 from Research_Agent.src.config.settings import settings
@@ -7,7 +7,7 @@ from Research_Agent.src.planning.planner import DAGExecutionPlan, TaskNode
 
 
 class DAGExecutor:
-    """Orchestrates multi-agent execution directly consuming Phase 1 DAGExecutionPlan Pydantic models."""
+    """Orchestrates multi-agent execution consuming Phase 1 DAGExecutionPlan Pydantic models."""
 
     def __init__(
             self,
@@ -20,16 +20,16 @@ class DAGExecutor:
         self.max_iterations_per_agent = max_iterations_per_agent
 
     def _extract_task_info(self, node: TaskNode, idx: int) -> Dict[str, Any]:
-        """Extracts task ID, description/query, and dependencies from a TaskNode."""
+        """Extracts task ID, sub-query, and dependencies from a TaskNode."""
         subtask = node.task
 
-        # Flexibly handle SubTask attribute naming (e.g., task_id vs id, query vs description)
-        task_id = getattr(subtask, "task_id", None) or getattr(subtask, "id", None) or f"task_{idx}"
-        description = getattr(subtask, "query", None) or getattr(subtask, "description", None) or str(subtask)
+        # Updated to check sub_query first (matching query_schema.py SubTask)
+        task_id = getattr(subtask, "task_id", None) or f"TASK_{idx}"
+        sub_query = getattr(subtask, "sub_query", None) or str(subtask)
 
         return {
             "task_id": str(task_id),
-            "description": description,
+            "description": sub_query,
             "dependencies": node.depends_on,
             "is_parallelizable": node.is_parallelizable,
             "raw_subtask": subtask,
@@ -77,52 +77,38 @@ class DAGExecutor:
         }
 
     def execute_dag(self, dag_plan: DAGExecutionPlan) -> Dict[str, Any]:
-        """Executes a Phase 1 DAGExecutionPlan in topological order."""
+        """Executes a DAGExecutionPlan wave-by-wave in topological order."""
         nodes: List[TaskNode] = dag_plan.nodes
         if not nodes:
             return {"status": "error", "error": "No nodes provided in DAG execution plan."}
 
-        # Parse nodes into a normalized lookup dictionary
+        # Index nodes by task_id
         task_map: Dict[str, Dict[str, Any]] = {}
         for idx, node in enumerate(nodes, 1):
             info = self._extract_task_info(node, idx)
             task_map[info["task_id"]] = info
 
         completed_results: Dict[str, Dict[str, Any]] = {}
-        pending_task_ids: Set[str] = set(task_map.keys())
-        completed_task_ids: Set[str] = set()
 
         print("=" * 60)
-        print(f"🎯 [DAG Executor] Executing Plan '{dag_plan.plan_id}' with {len(nodes)} Node(s)")
+        print(
+            f"🎯 [DAG Executor] Executing Plan '{dag_plan.plan_id}' ({len(nodes)} total nodes across {len(dag_plan.execution_waves)} waves)")
         print("=" * 60)
 
-        while pending_task_ids:
-            # Identify nodes whose dependencies are satisfied
-            ready_ids = [
-                t_id
-                for t_id in pending_task_ids
-                if set(task_map[t_id]["dependencies"]).issubset(completed_task_ids)
-            ]
+        # Iterate sequentially wave-by-wave as dictated by planner.py
+        for wave_idx, wave_task_ids in enumerate(dag_plan.execution_waves, start=1):
+            print(f"\n🌊 [Execution Wave {wave_idx}/{len(dag_plan.execution_waves)}] Running tasks: {wave_task_ids}")
 
-            if not ready_ids:
-                print("❌ [Executor Error] Cyclic dependency or deadlock detected in DAG.")
-                return {
-                    "status": "deadlock",
-                    "completed_tasks": completed_results,
-                    "unresolved_tasks": list(pending_task_ids),
-                }
-
-            print(f"\n📌 [Executor Batch] Ready Nodes: {ready_ids}")
-
-            # Execute ready nodes concurrently
             with concurrent.futures.ThreadPoolExecutor(
                     max_workers=self.max_workers
             ) as executor:
                 future_to_id = {}
 
-                for t_id in ready_ids:
+                for t_id in wave_task_ids:
                     task_info = task_map[t_id]
                     deps = task_info["dependencies"]
+
+                    # Context is automatically passed from prior waves!
                     context = self._build_context_for_task(deps, completed_results)
 
                     future = executor.submit(self._execute_single_task, task_info, context)
@@ -133,21 +119,17 @@ class DAGExecutor:
                     try:
                         res = future.result()
                         completed_results[t_id] = res
-                        completed_task_ids.add(t_id)
-                        pending_task_ids.remove(t_id)
-                        print(f"✅ [Executor Node Completed] '{t_id}' finished.")
+                        print(f"✅ [Node Completed] '{t_id}' finished.")
                     except Exception as e:
-                        print(f"❌ [Executor Node Failed] '{t_id}' failed: {e}")
+                        print(f"❌ [Node Failed] '{t_id}' failed: {e}")
                         completed_results[t_id] = {
                             "task_id": t_id,
                             "status": "error",
                             "error": str(e),
                         }
-                        completed_task_ids.add(t_id)
-                        pending_task_ids.remove(t_id)
 
         print("\n" + "=" * 60)
-        print("🎉 [DAG Execution Complete] All nodes executed.")
+        print("🎉 [DAG Execution Complete] All waves executed.")
         print("=" * 60)
 
         return {"status": "completed", "plan_id": dag_plan.plan_id, "results": completed_results}
