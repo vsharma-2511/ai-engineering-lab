@@ -10,8 +10,10 @@
     button { padding: 10px 20px; border: none; background: #0d6efd; color: #fff; font-size: 16px; border-radius: 4px; cursor: pointer; }
     button:disabled { background: #6c757d; }
     .event-log { font-family: monospace; font-size: 13px; background: #1e1e1e; color: #00ff66; padding: 15px; border-radius: 6px; height: 180px; overflow-y: auto; white-space: pre-wrap; }
-    .report-box { background: #fff; padding: 20px; border-left: 4px solid #0d6efd; min-height: 100px; }
+    .report-box { background: #fff; padding: 20px; border-left: 4px solid #0d6efd; min-height: 100px; position: relative; }
     .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; background: #e9ecef; font-size: 12px; font-weight: bold; margin-right: 5px; }
+    .badge-cache { background: #198754; color: #fff; }
+    .badge-live { background: #0d6efd; color: #fff; }
   </style>
 </head>
 <body>
@@ -37,12 +39,13 @@
 
   <script>
     let evtSource = null;
+    let isCacheHit = false;
 
     function logMessage(stage, message, data = null) {
       const logDiv = document.getElementById('log');
       const time = new Date().toLocaleTimeString();
       let text = `[${time}] [${stage.toUpperCase()}] ${message}\n`;
-      if (data) text += `  └─ ${JSON.stringify(data)}\n`;
+      if (data && Object.keys(data).length > 0) text += `  └─ ${JSON.stringify(data)}\n`;
       logDiv.textContent += text;
       logDiv.scrollTop = logDiv.scrollHeight;
     }
@@ -53,27 +56,48 @@
 
       const btn = document.getElementById('startBtn');
       btn.disabled = true;
+      isCacheHit = false;
       document.getElementById('log').textContent = '';
-      document.getElementById('reportBox').innerHTML = '<em>Executing multi-phase agent DAG...</em>';
+      document.getElementById('reportBox').innerHTML = '<em>Checking cache and executing research agent DAG...</em>';
 
       if (evtSource) evtSource.close();
 
       const url = `/api/v1/research/stream?query=${encodeURIComponent(query)}`;
       evtSource = new EventSource(url);
 
-      // standard SSE event handling
-      const events = ['init', 'stage_start', 'decomposition_complete', 'plan_complete', 'execution_complete', 'report_complete', 'error', 'close'];
+      // Explicitly listening for all SSE backend events including cache checks
+      const events = [
+        'init',
+        'stage_start',
+        'cache_hit',
+        'cache_miss',
+        'decomposition_complete',
+        'plan_complete',
+        'execution_complete',
+        'report_complete',
+        'error',
+        'close'
+      ];
 
       events.forEach(eventName => {
         evtSource.addEventListener(eventName, (e) => {
           const payload = JSON.parse(e.data);
 
-          if (eventName === 'report_complete') {
+          if (eventName === 'cache_hit') {
+            isCacheHit = true;
+            logMessage('cache_hit', '⚡ [FAST PATH] Response found in Semantic Cache!');
+          } else if (eventName === 'report_complete') {
             logMessage(eventName, payload.message);
             const report = payload.payload;
+
+            const badgeHtml = isCacheHit
+              ? `<span class="badge badge-cache">⚡ SERVED FROM CACHE</span>`
+              : `<span class="badge badge-live">🌐 LIVE EXECUTION</span>`;
+
             document.getElementById('reportBox').innerHTML = `
+              <div style="margin-bottom: 10px;">${badgeHtml}</div>
               <h3>${report.title || 'Research Summary'}</h3>
-              <div>${report.summary || JSON.stringify(report, null, 2)}</div>
+              <div>${report.executive_summary || report.summary || JSON.stringify(report, null, 2)}</div>
             `;
           } else if (eventName === 'close' || eventName === 'error') {
             logMessage(eventName, payload.message);

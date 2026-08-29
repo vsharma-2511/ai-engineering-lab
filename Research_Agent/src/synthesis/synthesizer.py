@@ -7,6 +7,7 @@ from openai import OpenAI
 
 from Research_Agent.src.config.settings import settings
 from Research_Agent.src.schemas.query_schema import ExecutionPlan
+from Research_Agent.src.utils.token_tracker import token_tracker
 
 
 class MetricHighlight(BaseModel):
@@ -77,6 +78,12 @@ class Synthesizer:
                 {"role": "user", "content": prompt},
             ],
             response_format=SynthesizedReport,
+        )
+        usage = response.usage
+        token_tracker.log_usage(
+            stage="Synthesizer",  # or "Executor: TASK_1", "Synthesizer"
+            prompt_tok=usage.prompt_tokens,
+            completion_tok=usage.completion_tokens,
         )
         return response.choices[0].message.parsed
 

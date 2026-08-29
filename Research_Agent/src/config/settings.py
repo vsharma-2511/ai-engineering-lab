@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+from pathlib import Path
 
 load_dotenv()
 
@@ -23,13 +24,19 @@ class Settings:
 
     # Default Models per Provider
     GEMINI_MODEL: str = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
-    OPENAI_MODEL: str = os.getenv("OPENAI_MODEL", "gpt-4o")
-    ANTHROPIC_MODEL: str = os.getenv("ANTHROPIC_MODEL", "claude-3-5-sonnet-20241022")
+    OPENAI_MODEL: str = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+    ANTHROPIC_MODEL: str = os.getenv("ANTHROPIC_MODEL", "claude-3-5-haiku-20241022")
 
     # Aliases for lowercase access
     gemini_model: str = GEMINI_MODEL
     openai_model: str = OPENAI_MODEL
     anthropic_model: str = ANTHROPIC_MODEL
+
+    # Path to Research_Agent/ directory
+    RESEARCH_AGENT_DIR: Path = Path(__file__).resolve().parent.parent.parent
+
+    # Absolute path ensuring storage inside Research_Agent/data/cache_db
+    QDRANT_STORAGE_PATH: str = str(RESEARCH_AGENT_DIR / "data" / "cache_db")
 
     @classmethod
     def get_default_model(cls, provider: str) -> str:

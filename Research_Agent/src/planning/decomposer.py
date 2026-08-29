@@ -3,6 +3,7 @@ from google.genai import types
 from openai import OpenAI
 from Research_Agent.src.config.settings import settings
 from Research_Agent.src.schemas.query_schema import ExecutionPlan
+from Research_Agent.src.utils.token_tracker import token_tracker
 
 SYSTEM_PROMPT = """
 You are an expert Query Decomposition System for an advanced multi-agent research architecture.
@@ -29,6 +30,12 @@ def _decompose_with_openai(user_query: str) -> ExecutionPlan:
             {"role": "user", "content": user_query},
         ],
         response_format=ExecutionPlan,
+    )
+    usage = response.usage
+    token_tracker.log_usage(
+        stage="Decomposer",  # or "Executor: TASK_1", "Synthesizer"
+        prompt_tok=usage.prompt_tokens,
+        completion_tok=usage.completion_tokens,
     )
     return response.choices[0].message.parsed
 

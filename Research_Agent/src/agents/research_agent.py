@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional
 from Research_Agent.src.config.settings import settings
 from Research_Agent.src.tools.scraper_tool import scrape_webpage
 from Research_Agent.src.tools.search_tool import web_search
-
+from Research_Agent.src.utils.token_tracker import token_tracker
 
 class ResearchAgent:
     """Multi-provider ReAct Research Agent configured via central Settings."""
@@ -161,7 +161,13 @@ class ResearchAgent:
                 tools=tools,
                 tool_choice="auto",
             )
+            usage = response.usage
 
+            token_tracker.log_usage(
+                stage="Executor",  # or "Executor: TASK_1", "Synthesizer"
+                prompt_tok=usage.prompt_tokens,
+                completion_tok=usage.completion_tokens,
+            )
             msg = response.choices[0].message
             messages.append(msg)
 
