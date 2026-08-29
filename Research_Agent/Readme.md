@@ -129,7 +129,7 @@ ENVIRONMENT="development"
 Run Uvicorn from the project root directory:
 
 ```bash
-uvicorn Research_Agent.src.app:app --reload
+uvicorn Research_Agent.src.api.app:app --reload
 ```
 
 The server will start at:
