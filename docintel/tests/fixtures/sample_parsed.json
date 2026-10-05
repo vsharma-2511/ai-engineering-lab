@@ -1,0 +1,559 @@
+{
+  "document_id": "6e77df4d-92a6-4a3c-9df3-766a6f120509",
+  "document_name": "DocIntel_Text_and_Tables_Test 8.01.26 PM 8.03.08 PM 8.10.47 PM.pdf",
+  "document_version": 1,
+  "parser": "pymupdf",
+  "pages": [
+    {
+      "page_number": 1,
+      "text": "DocIntel Parsing Test: Text and Tables\n\n  Synthetic sample data for testing PDF extraction. All names and values are fictional.\n\n 1. City service overview\n\n Northport expanded its library services between 2023 and 2025. The table below reports annual visits and active\n memberships. Visits are counted at the entrance; memberships count people with an active card at year end.\n\n Table 1. Northport library usage\n\n   Year               Library visits (thousands)                      Active members (thousands)\n\n   2023             412                                      68\n\n   2024             438                                      71\n\n   2025             465                                      75\n\n\n  Interpretation: visits increased from 412 thousand in 2023 to 465 thousand in 2025. The 2025 membership count was\n 75 thousand, not 465 thousand.\n\n  Note: figures are rounded to the nearest thousand. A visit is not a unique visitor.\n\n\n 2. Budget summary\n\n The budget categories below use Canadian dollars in millions. Capital spending is separate from operating spending;\n the total row is the sum of the two categories.\n\n Table 2. Northport library budget (CAD millions)\n\n   Category                                         2024                      2025\n\n   Operating                                                 8.4                            9.1\n\n    Capital                                                    1.2                            1.8\n\n    Total                                                      9.6                          10.9\n\n\n  Footnote: the 2025 capital amount includes a one-time building repair allocation of CAD 0.6 million.\n\n\n\n\n\nDocIntel test document - synthetic data                                                                         Page 1",
+      "method": "embedded_text",
+      "character_count": 1787,
+      "tables": [
+        {
+          "table_number": 1,
+          "page_number": 1,
+          "bbox": [
+            60.0,
+            199.0,
+            532.0,
+            299.0
+          ],
+          "rows": [
+            [
+              "Year",
+              "Library visits (thousands)",
+              "Active members (thousands)"
+            ],
+            [
+              "2023",
+              "412",
+              "68"
+            ],
+            [
+              "2024",
+              "438",
+              "71"
+            ],
+            [
+              "2025",
+              "465",
+              "75"
+            ]
+          ],
+          "row_count": 4,
+          "column_count": 3
+        },
+        {
+          "table_number": 2,
+          "page_number": 1,
+          "bbox": [
+            60.0,
+            470.0,
+            532.0,
+            570.0
+          ],
+          "rows": [
+            [
+              "Category",
+              "2024",
+              "2025"
+            ],
+            [
+              "Operating",
+              "8.4",
+              "9.1"
+            ],
+            [
+              "Capital",
+              "1.2",
+              "1.8"
+            ],
+            [
+              "Total",
+              "9.6",
+              "10.9"
+            ]
+          ],
+          "row_count": 4,
+          "column_count": 3
+        }
+      ],
+      "text_blocks": [
+        {
+          "block_number": 1,
+          "bbox": [
+            149.6510009765625,
+            54.80999755859375,
+            462.3489990234375,
+            78.21900177001953
+          ],
+          "text": "DocIntel Parsing Test: Text and Tables\n",
+          "classification": "OUTSIDE_TABLE",
+          "table_number": null
+        },
+        {
+          "block_number": 2,
+          "bbox": [
+            60.0,
+            91.4000015258789,
+            357.0159606933594,
+            102.39199829101562
+          ],
+          "text": "Synthetic sample data for testing PDF extraction. All names and values are fictional.\n",
+          "classification": "OUTSIDE_TABLE",
+          "table_number": null
+        },
+        {
+          "block_number": 3,
+          "bbox": [
+            60.0,
+            114.22999572753906,
+            184.1239776611328,
+            129.3769989013672
+          ],
+          "text": "1. City service overview\n",
+          "classification": "OUTSIDE_TABLE",
+          "table_number": null
+        },
+        {
+          "block_number": 4,
+          "bbox": [
+            60.0,
+            136.28750610351562,
+            532.05517578125,
+            163.3404998779297
+          ],
+          "text": "Northport expanded its library services between 2023 and 2025. The table below reports annual visits and active\nmemberships. Visits are counted at the entrance; memberships count people with an active card at year end.\n",
+          "classification": "OUTSIDE_TABLE",
+          "table_number": null
+        },
+        {
+          "block_number": 5,
+          "bbox": [
+            60.0,
+            176.22999572753906,
+            226.2649688720703,
+            191.3769989013672
+          ],
+          "text": "Table 1. Northport library usage\n",
+          "classification": "OUTSIDE_TABLE",
+          "table_number": null
+        },
+        {
+          "block_number": 6,
+          "bbox": [
+            68.0,
+            205.40499877929688,
+            460.6626892089844,
+            217.1094970703125
+          ],
+          "text": "Year\nLibrary visits (thousands)\nActive members (thousands)\n",
+          "classification": "INSIDE_TABLE",
+          "table_number": 1
+        },
+        {
+          "block_number": 7,
+          "bbox": [
+            68.0,
+            230.3625030517578,
+            353.4520263671875,
+            242.04150390625
+          ],
+          "text": "2023\n412\n68\n",
+          "classification": "INSIDE_TABLE",
+          "table_number": 1
+        },
+        {
+          "block_number": 8,
+          "bbox": [
+            68.0,
+            255.3625030517578,
+            353.4520263671875,
+            267.04150390625
+          ],
+          "text": "2024\n438\n71\n",
+          "classification": "INSIDE_TABLE",
+          "table_number": 1
+        },
+        {
+          "block_number": 9,
+          "bbox": [
+            68.0,
+            280.36248779296875,
+            353.4520263671875,
+            292.04150390625
+          ],
+          "text": "2025\n465\n75\n",
+          "classification": "INSIDE_TABLE",
+          "table_number": 1
+        },
+        {
+          "block_number": 10,
+          "bbox": [
+            60.0,
+            313.2875061035156,
+            552.0003662109375,
+            340.34051513671875
+          ],
+          "text": "Interpretation: visits increased from 412 thousand in 2023 to 465 thousand in 2025. The 2025 membership count was\n75 thousand, not 465 thousand.\n",
+          "classification": "OUTSIDE_TABLE",
+          "table_number": null
+        },
+        {
+          "block_number": 11,
+          "bbox": [
+            60.0,
+            350.3999938964844,
+            342.3679504394531,
+            361.3919982910156
+          ],
+          "text": "Note: figures are rounded to the nearest thousand. A visit is not a unique visitor.\n",
+          "classification": "OUTSIDE_TABLE",
+          "table_number": null
+        },
+        {
+          "block_number": 12,
+          "bbox": [
+            60.0,
+            385.2300109863281,
+            162.07998657226562,
+            400.37701416015625
+          ],
+          "text": "2. Budget summary\n",
+          "classification": "OUTSIDE_TABLE",
+          "table_number": null
+        },
+        {
+          "block_number": 13,
+          "bbox": [
+            60.0,
+            407.2875061035156,
+            551.0552978515625,
+            434.34051513671875
+          ],
+          "text": "The budget categories below use Canadian dollars in millions. Capital spending is separate from operating spending;\nthe total row is the sum of the two categories.\n",
+          "classification": "OUTSIDE_TABLE",
+          "table_number": null
+        },
+        {
+          "block_number": 14,
+          "bbox": [
+            60.0,
+            447.2300109863281,
+            309.9749450683594,
+            462.37701416015625
+          ],
+          "text": "Table 2. Northport library budget (CAD millions)\n",
+          "classification": "OUTSIDE_TABLE",
+          "table_number": null
+        },
+        {
+          "block_number": 15,
+          "bbox": [
+            68.0,
+            476.4049987792969,
+            437.904052734375,
+            488.1094970703125
+          ],
+          "text": "Category\n2024\n2025\n",
+          "classification": "INSIDE_TABLE",
+          "table_number": 2
+        },
+        {
+          "block_number": 16,
+          "bbox": [
+            68.0,
+            501.36248779296875,
+            430.8150329589844,
+            513.04150390625
+          ],
+          "text": "Operating\n8.4\n9.1\n",
+          "classification": "INSIDE_TABLE",
+          "table_number": 2
+        },
+        {
+          "block_number": 17,
+          "bbox": [
+            68.0,
+            526.3624877929688,
+            430.8150329589844,
+            538.04150390625
+          ],
+          "text": "Capital\n1.2\n1.8\n",
+          "classification": "INSIDE_TABLE",
+          "table_number": 2
+        },
+        {
+          "block_number": 18,
+          "bbox": [
+            68.0,
+            551.3624877929688,
+            435.5410461425781,
+            563.04150390625
+          ],
+          "text": "Total\n9.6\n10.9\n",
+          "classification": "INSIDE_TABLE",
+          "table_number": 2
+        },
+        {
+          "block_number": 19,
+          "bbox": [
+            60.0,
+            583.4000244140625,
+            409.93597412109375,
+            594.3920288085938
+          ],
+          "text": "Footnote: the 2025 capital amount includes a one-time building repair allocation of CAD 0.6 million.\n",
+          "classification": "OUTSIDE_TABLE",
+          "table_number": null
+        },
+        {
+          "block_number": 0,
+          "bbox": [
+            54.0,
+            748.4000244140625,
+            558.0,
+            759.3920288085938
+          ],
+          "text": "DocIntel test document - synthetic data\nPage 1\n",
+          "classification": "OUTSIDE_TABLE",
+          "table_number": null
+        }
+      ],
+      "warnings": []
+    },
+    {
+      "page_number": 2,
+      "text": "DocIntel Parsing Test: Continued\n\n 3. Program results\n\n The following table reports participation by program and location. Each row combines a program, a location, and its\n  participant count. Counts refer to 2025 only.\n\n Table 3. Program participation, 2025\n\n   Program                       Location                  Participants            Completion rate\n\n    Digital skills                       Central                 120                82%\n\n    Digital skills                     East                    85                 76%\n\n   Career workshops                 Central                 64                 91%\n\n   Career workshops                East                    48                 88%\n\n\n Example question: How many people joined Digital skills at the East location? The correct answer is 85. The 76%\n  figure in the same row is the completion rate, not the participant count.\n\n 4. Definitions and caveats\n\n Completion rate is the percentage of enrolled participants who attended the final session. It is calculated separately\n  for each program and location. The figures should not be added across percentage cells.\n\n  Source: Fictional Northport Service Office, DocIntel test dataset, prepared September 2026.\n\n\n\n\n\nDocIntel test document - synthetic data                                                                         Page 2",
+      "method": "embedded_text",
+      "character_count": 1351,
+      "tables": [
+        {
+          "table_number": 1,
+          "page_number": 2,
+          "bbox": [
+            60.0,
+            176.0,
+            532.0,
+            301.0
+          ],
+          "rows": [
+            [
+              "Program",
+              "Location",
+              "Participants",
+              "Completion rate"
+            ],
+            [
+              "Digital skills",
+              "Central",
+              "120",
+              "82%"
+            ],
+            [
+              "Digital skills",
+              "East",
+              "85",
+              "76%"
+            ],
+            [
+              "Career workshops",
+              "Central",
+              "64",
+              "91%"
+            ],
+            [
+              "Career workshops",
+              "East",
+              "48",
+              "88%"
+            ]
+          ],
+          "row_count": 5,
+          "column_count": 4
+        }
+      ],
+      "text_blocks": [
+        {
+          "block_number": 1,
+          "bbox": [
+            171.8699951171875,
+            54.80999755859375,
+            440.1299743652344,
+            78.21900177001953
+          ],
+          "text": "DocIntel Parsing Test: Continued\n",
+          "classification": "OUTSIDE_TABLE",
+          "table_number": null
+        },
+        {
+          "block_number": 2,
+          "bbox": [
+            60.0,
+            91.22999572753906,
+            156.59100341796875,
+            106.37699890136719
+          ],
+          "text": "3. Program results\n",
+          "classification": "OUTSIDE_TABLE",
+          "table_number": null
+        },
+        {
+          "block_number": 3,
+          "bbox": [
+            60.0,
+            113.2874984741211,
+            543.1226806640625,
+            140.3404998779297
+          ],
+          "text": "The following table reports participation by program and location. Each row combines a program, a location, and its\nparticipant count. Counts refer to 2025 only.\n",
+          "classification": "OUTSIDE_TABLE",
+          "table_number": null
+        },
+        {
+          "block_number": 4,
+          "bbox": [
+            60.0,
+            153.22999572753906,
+            248.9029541015625,
+            168.3769989013672
+          ],
+          "text": "Table 3. Program participation, 2025\n",
+          "classification": "OUTSIDE_TABLE",
+          "table_number": null
+        },
+        {
+          "block_number": 5,
+          "bbox": [
+            68.0,
+            182.40499877929688,
+            482.70208740234375,
+            194.1094970703125
+          ],
+          "text": "Program\nLocation\nParticipants\nCompletion rate\n",
+          "classification": "INSIDE_TABLE",
+          "table_number": 1
+        },
+        {
+          "block_number": 6,
+          "bbox": [
+            68.0,
+            207.3625030517578,
+            435.0085144042969,
+            219.04150390625
+          ],
+          "text": "Digital skills\nCentral\n120\n82%\n",
+          "classification": "INSIDE_TABLE",
+          "table_number": 1
+        },
+        {
+          "block_number": 7,
+          "bbox": [
+            68.0,
+            232.3625030517578,
+            435.0085144042969,
+            244.04150390625
+          ],
+          "text": "Digital skills\nEast\n85\n76%\n",
+          "classification": "INSIDE_TABLE",
+          "table_number": 1
+        },
+        {
+          "block_number": 8,
+          "bbox": [
+            68.0,
+            257.36248779296875,
+            435.0085144042969,
+            269.04150390625
+          ],
+          "text": "Career workshops\nCentral\n64\n91%\n",
+          "classification": "INSIDE_TABLE",
+          "table_number": 1
+        },
+        {
+          "block_number": 9,
+          "bbox": [
+            68.0,
+            282.36248779296875,
+            435.0085144042969,
+            294.04150390625
+          ],
+          "text": "Career workshops\nEast\n48\n88%\n",
+          "classification": "INSIDE_TABLE",
+          "table_number": 1
+        },
+        {
+          "block_number": 10,
+          "bbox": [
+            60.0,
+            315.2875061035156,
+            535.72216796875,
+            342.34051513671875
+          ],
+          "text": "Example question: How many people joined Digital skills at the East location? The correct answer is 85. The 76%\nfigure in the same row is the completion rate, not the participant count.\n",
+          "classification": "OUTSIDE_TABLE",
+          "table_number": null
+        },
+        {
+          "block_number": 11,
+          "bbox": [
+            60.0,
+            355.2300109863281,
+            195.1019744873047,
+            370.37701416015625
+          ],
+          "text": "4. Definitions and caveats\n",
+          "classification": "OUTSIDE_TABLE",
+          "table_number": null
+        },
+        {
+          "block_number": 12,
+          "bbox": [
+            60.0,
+            377.2875061035156,
+            543.1511840820312,
+            404.34051513671875
+          ],
+          "text": "Completion rate is the percentage of enrolled participants who attended the final session. It is calculated separately\nfor each program and location. The figures should not be added across percentage cells.\n",
+          "classification": "OUTSIDE_TABLE",
+          "table_number": null
+        },
+        {
+          "block_number": 13,
+          "bbox": [
+            60.0,
+            414.3999938964844,
+            384.5919494628906,
+            425.3919982910156
+          ],
+          "text": "Source: Fictional Northport Service Office, DocIntel test dataset, prepared September 2026.\n",
+          "classification": "OUTSIDE_TABLE",
+          "table_number": null
+        },
+        {
+          "block_number": 0,
+          "bbox": [
+            54.0,
+            748.4000244140625,
+            558.0,
+            759.3920288085938
+          ],
+          "text": "DocIntel test document - synthetic data\nPage 2\n",
+          "classification": "OUTSIDE_TABLE",
+          "table_number": null
+        }
+      ],
+      "warnings": []
+    }
+  ],
+  "quality": {
+    "total_pages": 2,
+    "pages_with_text": 2,
+    "pages_with_tables": [
+      1,
+      2
+    ],
+    "pages_needing_review": []
+  }
+}
