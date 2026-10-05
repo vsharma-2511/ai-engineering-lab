@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "docintel"
+version = "0.1.0"
+description = "Document intelligence RAG pipeline: PDF ingestion, chunking, embeddings, retrieval and QA"
+requires-python = ">=3.10"
+dependencies = [
+    "PyMuPDF>=1.24",
+    "watchdog>=4.0",
+    "numpy>=1.26",
+    "sentence-transformers>=3.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "scikit-learn>=1.4"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

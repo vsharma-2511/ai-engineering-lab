@@ -1,0 +1,101 @@
+{
+  "description": "Retrieval scenarios for the DocIntel test PDF. A chunk counts as relevant if it contains every phrase in at least one group of expect_any. An empty expect_any marks a question the corpus cannot answer.",
+  "cases": [
+    {
+      "id": "table_cell_digital_east",
+      "category": "table_cell_lookup",
+      "question": "How many people joined Digital skills at East in 2025?",
+      "expect_any": [["Location: East", "Participants: 85"]]
+    },
+    {
+      "id": "table_cell_career_east",
+      "category": "table_cell_lookup",
+      "question": "How many participants did Career workshops have at the East location?",
+      "expect_any": [["Program: Career workshops", "Participants: 48"]]
+    },
+    {
+      "id": "table_distractor_completion",
+      "category": "table_distractor_column",
+      "question": "What was the completion rate for Career workshops at Central?",
+      "expect_any": [["Program: Career workshops", "Completion rate: 91%"]]
+    },
+    {
+      "id": "table_members_2025",
+      "category": "table_distractor_column",
+      "question": "How many active library members were there in 2025?",
+      "expect_any": [["Year: 2025", "Active members (thousands): 75"]]
+    },
+    {
+      "id": "table_visits_2023",
+      "category": "table_cell_lookup",
+      "question": "How many library visits were recorded in 2023?",
+      "expect_any": [["Year: 2023", "Library visits (thousands): 412"]]
+    },
+    {
+      "id": "table_capital_2025",
+      "category": "table_year_header",
+      "question": "What was the capital budget in 2025?",
+      "expect_any": [["Category: Capital", "2025: 1.8"]]
+    },
+    {
+      "id": "table_total_2024",
+      "category": "table_year_header",
+      "question": "What was the total library budget for 2024?",
+      "expect_any": [["Category: Total", "2024: 9.6"]]
+    },
+    {
+      "id": "table_footnote_repair",
+      "category": "table_note",
+      "question": "Why did capital spending increase in 2025?",
+      "expect_any": [["building repair"]]
+    },
+    {
+      "id": "text_visit_counting",
+      "category": "narrative_text",
+      "question": "How are library visits counted?",
+      "expect_any": [["counted at the entrance"]]
+    },
+    {
+      "id": "text_completion_definition",
+      "category": "definition",
+      "question": "What does completion rate mean?",
+      "expect_any": [["Completion rate is the percentage"]]
+    },
+    {
+      "id": "text_rounding_note",
+      "category": "note",
+      "question": "Are the library usage figures rounded?",
+      "expect_any": [["rounded to the nearest thousand"]]
+    },
+    {
+      "id": "text_trend",
+      "category": "trend",
+      "question": "How did library visits change between 2023 and 2025?",
+      "expect_any": [["visits increased from 412"], ["Library visits (thousands): 412", "Library visits (thousands): 465"]]
+    },
+    {
+      "id": "text_capital_vs_operating",
+      "category": "narrative_text",
+      "question": "Is capital spending included in operating spending?",
+      "expect_any": [["Capital spending is separate"]]
+    },
+    {
+      "id": "text_source",
+      "category": "metadata",
+      "question": "Who prepared this dataset?",
+      "expect_any": [["Fictional Northport Service Office"]]
+    },
+    {
+      "id": "unanswerable_hours",
+      "category": "unanswerable",
+      "question": "What are the library's opening hours on Sunday?",
+      "expect_any": []
+    },
+    {
+      "id": "unanswerable_staff",
+      "category": "unanswerable",
+      "question": "How many staff does the library employ?",
+      "expect_any": []
+    }
+  ]
+}
