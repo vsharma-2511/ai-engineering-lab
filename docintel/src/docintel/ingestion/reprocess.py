@@ -12,6 +12,7 @@ from pathlib import Path
 from .. import config
 from ..chunking.chunk_storage import initialize_chunk_storage
 from ..tokens import get_token_counter
+from .library import current_file
 from .processor import file_checksum, process_document
 from .registry import get_latest_documents, initialize_registry
 
@@ -36,10 +37,8 @@ def main() -> None:
     summary = {}
 
     for record in records:
-        # Prefer the documents folder; fall back to the registered path.
-        path = config.DOCUMENTS_DIR / record["filename"]
-        if not path.is_file():
-            path = Path(record["source_path"])
+        # The archive, then the inbox, then the path it was registered at.
+        path = current_file(record) or Path(record["source_path"])
 
         if not path.is_file():
             print(f"SKIPPED: {record['filename']} | source file not found")

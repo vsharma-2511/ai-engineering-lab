@@ -97,17 +97,21 @@ def build_retriever(
     db_path: Path = config.DB_PATH,
     model_name: str = config.EMBEDDING_MODEL,
     encoder=None,
+    session_id: str | None = None,
 ) -> Retriever:
+    """Index the library, or one chat session's documents."""
     if encoder is None:
         from ..embeddings.encoder import get_encoder
         encoder = get_encoder(model_name)
 
-    chunks = load_latest_chunks(db_path)
+    chunks = load_latest_chunks(db_path, session_id)
     vectors = load_or_compute_vectors(db_path, chunks, encoder)
     return Retriever(chunks, vectors, encoder)
 
 
 _cache: dict[tuple, tuple[tuple, Retriever]] = {}
+# One entry per scope (library, each session); keep the most recent few.
+_CACHE_SIZE = 8
 
 
 def search(
@@ -116,22 +120,27 @@ def search(
     mode: str = "hybrid",
     db_path: Path = config.DB_PATH,
     model_name: str = config.EMBEDDING_MODEL,
+    session_id: str | None = None,
 ) -> list[dict]:
-    """Search the latest version of every CHUNKED document.
+    """Search the latest version of every CHUNKED document in scope:
+    the library, or with `session_id` only that chat session's documents.
 
     The index is kept between calls and rebuilt when the stored chunks
-    change (new documents, new versions or reprocessing).
+    change (new documents, new versions, reprocessing or deletion).
     """
-    chunks = load_latest_chunks(db_path)
+    chunks = load_latest_chunks(db_path, session_id)
     signature = tuple(
         (chunk["chunk_id"], text_hash(chunk["text"])) for chunk in chunks
     )
-    key = (str(db_path), model_name)
+    key = (str(db_path), model_name, session_id)
 
-    cached = _cache.get(key)
+    cached = _cache.pop(key, None)
     if cached is None or cached[0] != signature:
-        cached = (signature, build_retriever(db_path, model_name))
-        _cache[key] = cached
+        cached = (signature,
+                  build_retriever(db_path, model_name, session_id=session_id))
+    _cache[key] = cached  # most recently used last
+    while len(_cache) > _CACHE_SIZE:
+        _cache.pop(next(iter(_cache)))
 
     return cached[1].search(question, top_k=top_k, mode=mode)
 
@@ -142,13 +151,16 @@ def main() -> int:
     parser.add_argument("--top-k", type=int, default=5)
     parser.add_argument("--mode", choices=MODES, default="hybrid")
     parser.add_argument("--db", type=Path, default=config.DB_PATH)
+    parser.add_argument("--session",
+                        help="Search this chat session's documents only")
     args = parser.parse_args()
 
     if not args.db.is_file():
         print(f"Database not found: {args.db}")
         return 2
 
-    results = search(args.question, args.top_k, args.mode, args.db)
+    results = search(args.question, args.top_k, args.mode, args.db,
+                     session_id=args.session)
     if not results:
         print("No chunks found. Run the watcher or reprocess first.")
         return 2

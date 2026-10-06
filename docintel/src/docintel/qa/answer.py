@@ -88,6 +88,39 @@ def build_prompt(question: str, chunks: list[dict]) -> str:
     )
 
 
+def _contains(text: str, quote: str) -> bool:
+    """`quote` occurs in `text` without cutting a word or number in two.
+
+    Plain substring matching would accept "Participants: 8" from
+    "Participants: 85".
+    """
+    pattern = r"(?<!\w)" + re.escape(quote) + r"(?!\w)"
+    return re.search(pattern, text) is not None
+
+
+def _cells(line: str) -> list[str]:
+    return [cell.strip() for cell in line.split("|") if cell.strip()]
+
+
+def _matching_table_row(quote: str, chunk: dict) -> str | None:
+    """The table row containing every cell of `quote`, if there is one.
+
+    Models often quote a row without its irrelevant cells, e.g.
+    "Category: Capital | 2025: 1.8" from
+    "Category: Capital | 2024: 1.2 | 2025: 1.8". That is still exact
+    evidence as long as each quoted cell is a whole cell of one row.
+    """
+    wanted = _cells(quote)
+    if chunk["content_type"] != "table" or len(wanted) < 2:
+        return None
+
+    for line in chunk["text"].splitlines():
+        row = _normalize(line)
+        if set(wanted) <= set(_cells(row)):
+            return row
+    return None
+
+
 def check_citations(
     citations: list[dict],
     chunks: list[dict],
@@ -104,7 +137,10 @@ def check_citations(
             rejected.append({**citation, "reason": "no such source"})
             continue
         chunk = chunks[number - 1]
-        if not quote or quote not in _normalize(chunk["text"]):
+        if quote and not _contains(_normalize(chunk["text"]), quote):
+            # Show the full source row rather than the shortened quote.
+            quote = _matching_table_row(quote, chunk) or ""
+        if not quote:
             rejected.append({**citation, "reason": "quote not in source"})
             continue
         if (number, quote) in seen:
@@ -162,10 +198,19 @@ def answer(
     provider: str | None = None,
     model: str | None = None,
     db_path: Path = config.DB_PATH,
+    session_id: str | None = None,
 ) -> dict:
-    """Retrieve the best chunks for `question` and answer from them."""
+    """Retrieve the best chunks for `question` and answer from them.
+
+    Searches the library, or with `session_id` that chat session's
+    documents (and marks the session active).
+    """
     from ..retrieval.search import search
 
     llm = get_llm(provider, model)
-    chunks = search(question, top_k=top_k, db_path=db_path)
+    if session_id is not None:
+        from ..sessions import touch_session
+        touch_session(session_id, db_path)
+    chunks = search(question, top_k=top_k, db_path=db_path,
+                    session_id=session_id)
     return answer_from_chunks(question, chunks, llm)

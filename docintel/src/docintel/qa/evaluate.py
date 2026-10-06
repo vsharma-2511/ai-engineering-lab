@@ -5,7 +5,8 @@ A case passes when:
                 a chunk containing the expected text
   unanswerable  status is "not_found"
 
-Each case is one LLM call, so this costs money (or free-tier quota).
+Each case is one LLM call: free and local with Ollama, paid (or
+free-tier quota) with the cloud providers.
 
     python -m docintel.qa.evaluate
     python -m docintel.qa.evaluate --provider claude --sleep 4
@@ -55,6 +56,9 @@ def main() -> int:
     parser.add_argument("--only",
                         help="Comma-separated case ids to run")
     args = parser.parse_args()
+    # Show each case as it finishes, even when output is piped or logged
+    # (local models can take minutes per run).
+    sys.stdout.reconfigure(line_buffering=True)
 
     if not args.db.is_file():
         print(f"Database not found: {args.db}")
