@@ -16,6 +16,11 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8.0", "scikit-learn>=1.4"]
+# LLM providers for question answering; install the one you use.
+gemini = ["google-genai>=2.0"]
+openai = ["openai>=3.0"]
+claude = ["anthropic>=1.0"]
+llm = ["google-genai>=2.0", "openai>=3.0", "anthropic>=1.0"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -15,7 +15,7 @@ documents/*.pdf
   -> chunks table           data/registry.db
   -> embeddings             all-MiniLM-L6-v2, cached in chunk_vectors table
   -> retrieval/search       hybrid: vectors + BM25 keywords, merged by rank
-  -> qa                     (to do)
+  -> qa                     Gemini / OpenAI / Claude answer with verified page citations
 ```
 
 Table rows are rendered with their column names so embeddings can tell
@@ -47,6 +47,8 @@ from anywhere):
 | Same, printing the top chunks for misses | `python -m docintel.embeddings.check_embeddings --show-misses` |
 | Search the documents | `python -m docintel.retrieval.search "your question"` |
 | Compare hybrid / vector / BM25 retrieval | `python -m docintel.retrieval.evaluate` |
+| Ask a question | `python -m docintel.qa.ask "your question"` |
+| Run the QA eval (one LLM call per case) | `python -m docintel.qa.evaluate --sleep 4` |
 | Unit tests | `pytest` |
 
 Without installing, you can run the same modules from the folder above
@@ -74,6 +76,40 @@ both ranks for debugging.
 Chunk vectors are cached in `data/registry.db`, so only new or changed
 chunks are embedded. The in-memory index rebuilds automatically when
 documents are added or reprocessed.
+
+## Question answering
+
+`qa` retrieves the top chunks, sends them to an LLM as numbered sources,
+and asks for JSON: whether the sources answer the question, the answer
+with `[n]` markers, and an exact quote for each source used. Every quote
+is then checked against its chunk, so a citation is kept only if those
+words really appear on that page. The result `status` is:
+
+- `answered`: at least one citation was verified
+- `not_found`: the documents don't answer the question
+- `unsupported`: the model answered, but none of its quotes are in the
+  sources, so don't trust the answer
+
+### Choosing the model
+
+| Provider | Install | API key | Default model |
+|---|---|---|---|
+| `gemini` (default) | `pip install -e ".[gemini]"` | `GEMINI_API_KEY` | `gemini-3.8-flash` |
+| `openai` | `pip install -e ".[openai]"` | `OPENAI_API_KEY` | `gpt-5.4-mini` |
+| `claude` | `pip install -e ".[claude]"` | `ANTHROPIC_API_KEY` | `claude-opus-5-5` |
+
+Choose with environment variables, or per command with `--provider` and
+`--model`:
+
+```bash
+export DOCINTEL_LLM_PROVIDER=gemini      # gemini | openai | claude
+export DOCINTEL_LLM_MODEL=gemini-3.8-flash   # optional
+python -m docintel.qa.ask "Who prepared this dataset?" --provider openai
+```
+
+Gemini's free tier is enough for this prototype. Google may use
+free-tier prompts to improve its products, so don't send confidential
+documents on it.
 
 ## Configuration
 

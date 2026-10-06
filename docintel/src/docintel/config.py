@@ -29,3 +29,19 @@ CHUNK_MAX_TOKENS = 200
 # Upper bound on rows in one table chunk; the token budget usually
 # splits tables earlier.
 TABLE_MAX_ROWS_PER_CHUNK = 25
+
+# Question answering. Choose the LLM with environment variables:
+#   DOCINTEL_LLM_PROVIDER = gemini | openai | claude
+#   DOCINTEL_LLM_MODEL    = a model of that provider (optional)
+# API keys: GEMINI_API_KEY, OPENAI_API_KEY or ANTHROPIC_API_KEY.
+QA_PROVIDER = os.environ.get("DOCINTEL_LLM_PROVIDER", "gemini").lower()
+QA_MODEL = os.environ.get("DOCINTEL_LLM_MODEL") or None
+QA_DEFAULT_MODELS = {
+    "gemini": "gemini-3.8-flash",
+    "openai": "gpt-5.4-mini",
+    "claude": "claude-opus-5-5",
+}
+QA_CLAUDE_EFFORT = "low"
+
+# Chunks sent to the LLM per question.
+QA_TOP_K = 5
