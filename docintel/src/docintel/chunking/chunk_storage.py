@@ -110,16 +110,33 @@ def initialize_chunk_storage(db_path: Path) -> None:
             ON chunks(document_id, document_version)
         """)
 
-def load_latest_chunks(db_path: Path) -> list[dict]:
+def load_latest_chunks(
+    db_path: Path,
+    session_id: str | None = None,
+) -> list[dict]:
     """Chunks of the newest CHUNKED version of each document.
 
     Older versions stay in the table for history but must never be
     retrieved, or answers could quote superseded documents.
+
+    Without `session_id`: the library (documents not uploaded into a
+    chat). With it: only the documents of that chat session.
     """
+    # Older databases lack the session columns and tables.
+    from ..ingestion.registry import initialize_registry
+    initialize_registry(db_path)
+
+    if session_id is None:
+        scope, parameters = "d.session_id IS NULL", ()
+    else:
+        scope = ("d.document_id IN (SELECT document_id FROM "
+                 "session_documents WHERE session_id = ?)")
+        parameters = (session_id,)
+
     with sqlite3.connect(db_path) as connection:
         connection.row_factory = sqlite3.Row
         rows = connection.execute(
-            """
+            f"""
             SELECT c.chunk_id, c.document_id, c.document_version,
                    c.document_name, c.page_number, c.content_type,
                    c.text, c.metadata_json
@@ -128,12 +145,14 @@ def load_latest_chunks(db_path: Path) -> list[dict]:
               ON d.document_id = c.document_id
              AND d.version = c.document_version
             WHERE d.status = 'CHUNKED'
+              AND {scope}
               AND d.version = (
                   SELECT MAX(version) FROM documents
                   WHERE filename = d.filename
               )
             ORDER BY c.document_name, c.page_number, c.chunk_id
-            """
+            """,
+            parameters,
         ).fetchall()
 
     chunks = []

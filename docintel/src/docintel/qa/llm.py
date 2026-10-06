@@ -1,15 +1,19 @@
-"""One interface over Gemini, OpenAI and Claude: prompt in, JSON out.
+"""One interface over Ollama, Gemini, OpenAI and Claude: prompt in, JSON out.
 
 Every provider is asked for the same JSON schema, so the QA code never
-depends on which model answered. SDKs are imported lazily: install only
-the one you use (pip install -e ".[gemini]", ".[openai]" or ".[claude]").
+depends on which model answered. Ollama runs models locally (free, no
+API key) and needs no extra package. The cloud SDKs are imported lazily:
+install only the one you use (pip install -e ".[gemini]", ".[openai]"
+or ".[claude]").
 
-    llm = get_llm("gemini")                 # provider default model
+    llm = get_llm("ollama")                 # provider default model
     llm = get_llm("openai", "gpt-5.4-mini")
     data = llm.generate_json(system, prompt, schema)
 """
 import json
 import os
+import urllib.error
+import urllib.request
 
 from .. import config
 
@@ -183,7 +187,96 @@ class ClaudeLLM:
         )
 
 
+class OllamaLLM:
+    """A model served by a local Ollama (https://ollama.com).
+
+    Uses Ollama's REST API directly, so no Python package is needed.
+    """
+
+    provider = "ollama"
+
+    def __init__(self, model: str):
+        self.model = model
+        self.host = config.QA_OLLAMA_HOST.rstrip("/")
+        self._think = config.QA_OLLAMA_THINK
+        self._check_model_available()
+
+    def _request(self, path: str, body: dict | None = None) -> dict:
+        request = urllib.request.Request(
+            self.host + path,
+            data=None if body is None else json.dumps(body).encode(),
+            headers={"Content-Type": "application/json"},
+        )
+        try:
+            with urllib.request.urlopen(
+                request, timeout=config.QA_OLLAMA_TIMEOUT
+            ) as response:
+                return json.loads(response.read())
+        except urllib.error.HTTPError as exc:
+            detail = exc.read().decode(errors="replace")
+            try:
+                detail = json.loads(detail).get("error", detail)
+            except json.JSONDecodeError:
+                pass
+            raise LLMError(f"Ollama error {exc.code}: {detail}") from exc
+        except (urllib.error.URLError, TimeoutError) as exc:
+            reason = getattr(exc, "reason", exc)
+            if isinstance(reason, ConnectionRefusedError):
+                raise LLMError(
+                    f"Ollama is not running at {self.host}. Start the "
+                    "Ollama app, or run: ollama serve"
+                ) from exc
+            raise LLMError(f"Could not reach Ollama: {reason}") from exc
+
+    def _check_model_available(self) -> None:
+        names = {m["name"] for m in self._request("/api/tags")["models"]}
+        wanted = self.model if ":" in self.model else self.model + ":latest"
+        if wanted not in names:
+            raise LLMError(
+                f"Ollama model {self.model!r} is not downloaded. Run:\n"
+                f"  ollama pull {self.model}\n"
+                f"Installed: {', '.join(sorted(names)) or 'none'}"
+            )
+
+    def generate_json(self, system: str, prompt: str, schema: dict) -> dict:
+        body = {
+            "model": self.model,
+            "messages": [
+                {"role": "system", "content": system},
+                {"role": "user", "content": prompt},
+            ],
+            "format": schema,
+            "stream": False,
+            "options": {
+                "temperature": 0,
+                # Ollama's default context can be smaller than our prompt
+                # and it truncates silently, so set it explicitly.
+                "num_ctx": config.QA_OLLAMA_NUM_CTX,
+            },
+        }
+        if self._think is not None:
+            body["think"] = self._think
+
+        try:
+            data = self._request("/api/chat", body)
+        except LLMError as exc:
+            # Models without a thinking mode may reject the field.
+            if "think" not in body or "think" not in str(exc).lower():
+                raise
+            self._think = None
+            body = {key: value for key, value in body.items()
+                    if key != "think"}
+            data = self._request("/api/chat", body)
+
+        if data.get("done_reason") == "length":
+            raise LLMError(
+                "Ollama's answer was cut off; raise DOCINTEL_OLLAMA_NUM_CTX"
+            )
+        return _parse(data.get("message", {}).get("content"), self.provider)
+
+
 PROVIDERS = {
+    "ollama": OllamaLLM,
     "gemini": GeminiLLM,
     "openai": OpenAILLM,
     "claude": ClaudeLLM,

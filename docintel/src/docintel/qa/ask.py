@@ -21,6 +21,8 @@ def main() -> int:
     parser.add_argument("--model", help="default: the provider's default")
     parser.add_argument("--top-k", type=int, default=config.QA_TOP_K)
     parser.add_argument("--db", type=Path, default=config.DB_PATH)
+    parser.add_argument("--session",
+                        help="Ask about this chat session's documents")
     parser.add_argument("--show-sources", action="store_true",
                         help="List every retrieved chunk, cited or not")
     args = parser.parse_args()
@@ -31,7 +33,7 @@ def main() -> int:
 
     try:
         result = answer(args.question, args.top_k, args.provider,
-                        args.model, args.db)
+                        args.model, args.db, session_id=args.session)
     except LLMError as exc:
         print(f"Error: {exc}")
         return 2

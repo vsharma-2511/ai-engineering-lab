@@ -133,6 +133,7 @@ def run_research_pipeline(user_query: str):
 
 if __name__ == "__main__":
     query = "What is the inflation rate and GDP growth in Canada for 2024?"
+    # query = "What is the api key i am using in this project?"
 
     # Run 1: Cold Execution (Cache Miss)
     print("\n=================== RUN 1: COLD EXECUTION ===================")

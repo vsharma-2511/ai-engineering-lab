@@ -8,6 +8,16 @@ def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
+def registry_key(filename: str, session_id: str | None = None) -> str:
+    """The `filename` column: versions are counted per key.
+
+    Library documents use their filename. A session's uploads get their
+    own namespace, so uploading "Report.pdf" into a chat never becomes a
+    new version of the library's "Report.pdf".
+    """
+    return filename if session_id is None else f"session:{session_id}/{filename}"
+
+
 def initialize_registry(db_path: Path) -> None:
     db_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -33,20 +43,51 @@ def initialize_registry(db_path: Path) -> None:
             ON documents (checksum)
         """)
 
+        # Added for chat sessions. NULL means a library document.
+        columns = {row[1] for row in connection.execute(
+            "PRAGMA table_info(documents)"
+        )}
+        if "session_id" not in columns:
+            connection.execute(
+                "ALTER TABLE documents ADD COLUMN session_id TEXT"
+            )
+
+        connection.execute("""
+            CREATE TABLE IF NOT EXISTS sessions (
+                session_id TEXT PRIMARY KEY,
+                created_at TEXT NOT NULL,
+                last_active_at TEXT NOT NULL
+            )
+        """)
+
+        # Every document a session can search: its own uploads plus
+        # library documents it reused instead of processing again.
+        connection.execute("""
+            CREATE TABLE IF NOT EXISTS session_documents (
+                session_id TEXT NOT NULL,
+                document_id TEXT NOT NULL,
+                PRIMARY KEY (session_id, document_id)
+            )
+        """)
+
 
 def register_document(
     db_path: Path,
     path: Path,
     checksum: str,
+    session_id: str | None = None,
 ) -> tuple[str, int | None]:
     """
-    Register a stable file.
+    Register a stable file in the library, or in a chat session.
 
     Returns:
         ("already_registered", version) for the same filename and contents
-        ("duplicate_content", None) if another filename has these contents
+        ("duplicate_content", None) if another filename in the same scope
+            (library or this session) has these contents
         ("registered", version) for a new document or version
     """
+    key = registry_key(path.name, session_id)
+
     with sqlite3.connect(db_path) as connection:
         # Serialize the check-and-insert operation.
         connection.execute("BEGIN IMMEDIATE")
@@ -59,7 +100,7 @@ def register_document(
             ORDER BY version DESC
             LIMIT 1
             """,
-            (path.name,),
+            (key,),
         ).fetchone()
 
         if latest is not None and latest[1] == checksum:
@@ -69,10 +110,10 @@ def register_document(
             """
             SELECT document_id
             FROM documents
-            WHERE checksum = ?
+            WHERE checksum = ? AND session_id IS ?
             LIMIT 1
             """,
-            (checksum,),
+            (checksum, session_id),
         ).fetchone()
 
         if duplicate is not None:
@@ -85,17 +126,18 @@ def register_document(
             """
             INSERT INTO documents (
                 document_id, filename, checksum, version, status,
-                source_path, created_at, updated_at
+                source_path, session_id, created_at, updated_at
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 str(uuid.uuid4()),
-                path.name,
+                key,
                 checksum,
                 version,
                 "DISCOVERED",
                 str(path),
+                session_id,
                 now,
                 now,
             ),
@@ -103,18 +145,28 @@ def register_document(
 
         return "registered", version
 
-def get_latest_document(db_path: Path, filename: str) -> dict | None:
+DOCUMENT_COLUMNS = """
+    document_id, filename, checksum, version, status, source_path,
+    archive_path, session_id, error_message
+"""
+
+
+def get_latest_document(
+    db_path: Path,
+    filename: str,
+    session_id: str | None = None,
+) -> dict | None:
     with sqlite3.connect(db_path) as connection:
         connection.row_factory = sqlite3.Row
         row = connection.execute(
-            """
-            SELECT document_id, filename, checksum, version, status
+            f"""
+            SELECT {DOCUMENT_COLUMNS}
             FROM documents
             WHERE filename = ?
             ORDER BY version DESC
             LIMIT 1
             """,
-            (filename,),
+            (registry_key(filename, session_id),),
         ).fetchone()
 
     return dict(row) if row else None
@@ -136,14 +188,46 @@ def update_document_status(
             (status, error_message, utc_now(), document_id),
         )
 
+def get_document_versions(db_path: Path, key: str) -> list[dict]:
+    """Every registered version of one registry key, oldest first."""
+    with sqlite3.connect(db_path) as connection:
+        connection.row_factory = sqlite3.Row
+        rows = connection.execute(
+            f"""
+            SELECT {DOCUMENT_COLUMNS}
+            FROM documents
+            WHERE filename = ?
+            ORDER BY version
+            """,
+            (key,),
+        ).fetchall()
+
+    return [dict(row) for row in rows]
+
+
+def set_archive_path(db_path: Path, document_id: str, path: Path) -> None:
+    with sqlite3.connect(db_path) as connection:
+        connection.execute(
+            """
+            UPDATE documents SET archive_path = ?, updated_at = ?
+            WHERE document_id = ?
+            """,
+            (str(path), utc_now(), document_id),
+        )
+
+
 def get_latest_documents(db_path: Path) -> list[dict]:
-    """The newest registered version of every filename."""
+    """The newest registered version of every registry key.
+
+    Includes chat-session uploads; their `session_id` is set.
+    """
     with sqlite3.connect(db_path) as connection:
         connection.row_factory = sqlite3.Row
         rows = connection.execute(
             """
             SELECT d.document_id, d.filename, d.checksum, d.version,
-                   d.status, d.source_path, d.error_message
+                   d.status, d.source_path, d.archive_path, d.session_id,
+                   d.error_message
             FROM documents AS d
             JOIN (
                 SELECT filename, MAX(version) AS version

@@ -2,20 +2,20 @@
 
 A retrieval-augmented generation (RAG) pipeline for PDFs containing both
 prose and tables. Documents dropped into `documents/` are registered with
-versioning, parsed, and split into validated, token-limited chunks ready
-for embedding.
+versioning, parsed, split into validated, token-limited chunks, embedded,
+and answered from with verified page citations.
 
 ## Pipeline
 
 ```
-documents/*.pdf
+documents/*.pdf            (inbox; processed PDFs move to archive/)
   -> ingestion/watcher      register (checksum + version) in data/registry.db
   -> parsing/pdf_parser     text blocks + tables (PyMuPDF), header/footer removal
   -> chunking/pipeline      text chunks + table chunks, lossless-coverage checks
   -> chunks table           data/registry.db
   -> embeddings             all-MiniLM-L6-v2, cached in chunk_vectors table
   -> retrieval/search       hybrid: vectors + BM25 keywords, merged by rank
-  -> qa                     Gemini / OpenAI / Claude answer with verified page citations
+  -> qa                     Ollama (local) / Gemini / OpenAI / Claude answer with verified page citations
 ```
 
 Table rows are rendered with their column names so embeddings can tell
@@ -43,6 +43,10 @@ from anywhere):
 |---|---|
 | Watch `documents/` and process new PDFs | `python -m docintel.ingestion.watcher` |
 | Re-run parsing/chunking for registered PDFs | `python -m docintel.ingestion.reprocess` |
+| List library documents | `python -m docintel.ingestion.library list` |
+| Remove a document and all its data | `python -m docintel.ingestion.library remove "Report.pdf"` |
+| List / end / clean up chat sessions | `python -m docintel.sessions list` (or `end <id>`, `cleanup`) |
+| Ask about one session's documents | `python -m docintel.qa.ask "question" --session <id>` |
 | Check embeddings + retrieval scenarios | `python -m docintel.embeddings.check_embeddings` |
 | Same, printing the top chunks for misses | `python -m docintel.embeddings.check_embeddings --show-misses` |
 | Search the documents | `python -m docintel.retrieval.search "your question"` |
@@ -94,7 +98,8 @@ words really appear on that page. The result `status` is:
 
 | Provider | Install | API key | Default model |
 |---|---|---|---|
-| `gemini` (default) | `pip install -e ".[gemini]"` | `GEMINI_API_KEY` | `gemini-3.8-flash` |
+| `ollama` (default) | [Ollama app](https://ollama.com/download), then `ollama pull qwen3:4b` | none, runs locally | `qwen3:4b` |
+| `gemini` | `pip install -e ".[gemini]"` | `GEMINI_API_KEY` | `gemini-3.8-flash` |
 | `openai` | `pip install -e ".[openai]"` | `OPENAI_API_KEY` | `gpt-5.4-mini` |
 | `claude` | `pip install -e ".[claude]"` | `ANTHROPIC_API_KEY` | `claude-opus-5-5` |
 
@@ -102,10 +107,19 @@ Choose with environment variables, or per command with `--provider` and
 `--model`:
 
 ```bash
-export DOCINTEL_LLM_PROVIDER=gemini      # gemini | openai | claude
-export DOCINTEL_LLM_MODEL=gemini-3.8-flash   # optional
-python -m docintel.qa.ask "Who prepared this dataset?" --provider openai
+export DOCINTEL_LLM_PROVIDER=ollama      # ollama | gemini | openai | claude
+export DOCINTEL_LLM_MODEL=qwen3:4b       # optional
+python -m docintel.qa.ask "Who prepared this dataset?" --provider gemini
 ```
+
+Ollama runs the model on your own machine, so it's free and nothing
+leaves your computer. Optional settings: `OLLAMA_HOST` (default
+`http://localhost:11434`), `DOCINTEL_OLLAMA_NUM_CTX` (context window,
+default 4096 tokens), `DOCINTEL_OLLAMA_TIMEOUT` (seconds, default 300)
+and `DOCINTEL_OLLAMA_THINK` (default `true`: thinking models such as
+qwen3 reason before answering; without it qwen3:4b missed answers that
+were in the sources). On an 8 GB Mac, stay with models of about 4B
+parameters or fewer, and expect roughly 10–20 seconds per answer.
 
 Gemini's free tier is enough for this prototype. Google may use
 free-tier prompts to improve its products, so don't send confidential
@@ -123,6 +137,32 @@ Set `DOCINTEL_HOME` to use a different project folder.
 chunk must contain, grouped by scenario (table cell lookup, distractor
 column, year headers, notes, narrative text, definitions, trends,
 unanswerable). Add cases whenever you add documents.
+
+## Document library and chat sessions
+
+There are two places a document can live.
+
+**The library** holds documents you keep. Drop a PDF into `documents/`
+while the watcher runs. Once it is processed (`CHUNKED`), the PDF moves
+to `archive/<name>.v<version>.pdf`. The original is kept so `reprocess`
+can re-read it after parser or chunker changes. Files that end up
+`NEEDS_REVIEW` or `FAILED` stay in `documents/`. Plain searches and
+questions use the library.
+
+**Chat sessions** are for chat and forget. A file uploaded into a session
+(`sessions.add_session_document`) is searchable only inside that
+session, never from the library. Ending the session deletes it.
+Sessions idle for more than 24 hours (`DOCINTEL_SESSION_IDLE_HOURS`) are
+ended by `python -m docintel.sessions cleanup`. If an upload is identical
+to a library document, the session reuses the library's chunks, and
+ending the session leaves the library copy alone.
+
+**Removing a document** deletes everything derived from it, for every
+version: chunks, vectors, parsed JSON, registry rows and its PDF. Run
+`python -m docintel.ingestion.library remove "Report.pdf"`, or delete
+the PDF from `archive/` (or from `documents/` if it was never archived).
+The watcher notices deletions while it runs, and catches the rest the
+next time it starts.
 
 ## Document statuses
 
