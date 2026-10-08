@@ -26,7 +26,7 @@ import uuid
 
 from . import config
 from .chunking.chunk_storage import initialize_chunk_storage
-from .ingestion.library import delete_document
+from .ingestion.library import delete_document, processing_message
 from .ingestion.processor import file_checksum, process_document
 from .ingestion.registry import (
     get_latest_document,
@@ -148,15 +148,9 @@ def add_session_document(
     if status == "CHUNKED":
         _link(db_path, session_id, record["document_id"])
 
-    messages = {
-        "CHUNKED": "Ready to chat.",
-        "NEEDS_REVIEW": "Some pages could not be read reliably (for example "
-                        "scanned images); the file is not searchable.",
-        "FAILED": "Processing failed; the file is not searchable.",
-    }
     return {"status": status, "filename": stored.name,
             "document_id": record["document_id"],
-            "message": messages.get(status, status)}
+            "message": processing_message(status, record["document_id"])}
 
 
 def end_session(session_id: str, db_path: Path = config.DB_PATH) -> dict:

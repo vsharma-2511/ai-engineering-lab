@@ -180,3 +180,23 @@ def test_changed_table_cell_is_caught(parsed, monkeypatch):
     monkeypatch.setattr(pipeline, "create_table_chunks", tampered)
     with pytest.raises(ValueError, match="cells changed"):
         chunk(parsed)
+
+
+def test_table_notes_stop_at_the_next_table():
+    """OCR'd tables have no INSIDE_TABLE text blocks, so the next table's
+    position is what stops the note search."""
+    from docintel.chunking.table_chunker import find_table_notes
+
+    def block(number, top, text):
+        return {"block_number": number, "bbox": [50, top, 500, top + 12],
+                "text": text, "classification": "OUTSIDE_TABLE"}
+
+    first = {"bbox": [50, 100, 500, 200]}
+    second = {"bbox": [50, 300, 500, 400]}
+    page = {"tables": [first, second], "text_blocks": [
+        block(1, 210, "Note: belongs to the first table"),
+        block(2, 410, "Footnote: belongs to the second table"),
+    ]}
+
+    assert [b["block_number"] for b in find_table_notes(page, first)] == [1]
+    assert [b["block_number"] for b in find_table_notes(page, second)] == [2]

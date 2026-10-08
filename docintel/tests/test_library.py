@@ -305,3 +305,73 @@ def test_upload_rejects_unknown_session_and_non_pdf(project):
     text_file.write_text("hello")
     with pytest.raises(ValueError, match="Unsupported"):
         sessions.add_session_document(session, text_file, config.DB_PATH)
+
+
+# --- adding from the UI (no watcher) ------------------------------------
+
+def test_add_to_library_processes_and_archives(project):
+    from docintel.ingestion.library import add_to_library
+    source = upload(project, "Report.pdf", "Revenue grew 5 percent.")
+
+    result = add_to_library(source, config.DB_PATH, approximate_token_count)
+
+    assert result["status"] == "CHUNKED"
+    assert (config.ARCHIVE_DIR / "Report.v1.pdf").is_file()
+    assert not (config.DOCUMENTS_DIR / "Report.pdf").exists()  # watcher-safe
+    assert list((config.UPLOADS_DIR / "library").iterdir()) == []
+    assert source.is_file()  # the caller's file is left alone
+
+    again = add_to_library(source, config.DB_PATH, approximate_token_count)
+    assert again["message"] == "Already in the library."
+    assert rows("documents") == 1
+
+
+def test_add_to_library_rejects_duplicates_and_non_pdfs(project):
+    from docintel.ingestion.library import add_to_library
+    source = upload(project, "A.pdf", "Same contents.")
+    add_to_library(source, config.DB_PATH, approximate_token_count)
+    copy = project / "B.pdf"
+    copy.write_bytes(source.read_bytes())
+
+    assert add_to_library(copy, config.DB_PATH,
+                          approximate_token_count)["status"] == "DUPLICATE"
+    with pytest.raises(ValueError, match="Unsupported"):
+        add_to_library(project / "notes.txt", config.DB_PATH)
+
+
+def test_unreadable_upload_is_left_in_the_inbox(project):
+    from docintel.ingestion.library import add_to_library
+    blank = project / "Blank.pdf"
+    document = fitz.open()
+    document.new_page()  # nothing on it: nothing to index
+    document.save(blank)
+
+    result = add_to_library(blank, config.DB_PATH, approximate_token_count)
+
+    assert result["status"] == "NEEDS_REVIEW"
+    assert result["message"].startswith(
+        "Not searchable: page 1: the document has no text.")
+    assert (config.DOCUMENTS_DIR / "Blank.pdf").is_file()
+    assert not any(config.ARCHIVE_DIR.iterdir())
+
+
+def test_scanned_upload_without_ocr_explains_why(project, monkeypatch):
+    from docintel.ingestion.library import add_to_library
+    monkeypatch.setattr(config, "OCR_ENGINE", "none")
+    scan = project / "Scan.pdf"
+    document = fitz.open()
+    page = document.new_page()
+    pixmap = fitz.Pixmap(fitz.csGRAY, fitz.IRect(0, 0, 595, 842), False)
+    pixmap.clear_with(220)
+    page.insert_image(page.rect, stream=pixmap.tobytes("png"))
+    document.save(scan)
+
+    result = add_to_library(scan, config.DB_PATH, approximate_token_count)
+
+    assert result["status"] == "NEEDS_REVIEW"
+    assert "it is scanned and OCR is turned off" in result["message"]
+
+
+def test_library_list_shows_the_document_type(project):
+    ingest(make_pdf(config.DOCUMENTS_DIR / "Typed.pdf", "Typed facts."))
+    assert list_library(config.DB_PATH)[0]["document_type"] == "digital"

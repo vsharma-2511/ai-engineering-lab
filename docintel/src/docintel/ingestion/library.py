@@ -12,6 +12,7 @@ version: chunks, vectors, parsed JSON, registry rows and its files.
     python -m docintel.ingestion.library remove "Report.pdf"
 """
 import argparse
+import json
 from pathlib import Path
 import shutil
 import sqlite3
@@ -20,11 +21,13 @@ import sys
 from .. import config
 from ..chunking.chunk_storage import initialize_chunk_storage
 from ..retrieval.vector_store import initialize_vector_storage
-from .processor import file_checksum
+from .processor import file_checksum, process_document
 from .registry import (
     get_document_versions,
+    get_latest_document,
     get_latest_documents,
     initialize_registry,
+    register_document,
     set_archive_path,
 )
 
@@ -64,6 +67,123 @@ def archive_document(
     shutil.move(str(path), destination)
     set_archive_path(db_path, record["document_id"], destination)
     return destination
+
+
+# Plain-language versions of parser warnings (see parsing/pdf_parser.py).
+REVIEW_REASONS = {
+    "ocr_disabled": "it is scanned and OCR is turned off",
+    "ocr_failed": "OCR failed on it",
+    "ocr_found_no_text": "OCR found no readable text",
+    "low_ocr_confidence": "the scan is too unclear to read reliably",
+    "no_text_in_document": "the document has no text",
+    "little_or_no_extractable_text": "it has almost no text",
+    "table_extraction_failed": "a table could not be read",
+}
+
+
+def parse_summary(document_id: str, parsed_dir: Path | None = None) -> dict:
+    """Document type, OCR pages and review reasons from the saved parse."""
+    path = (parsed_dir or config.PARSED_DIR) / f"{document_id}.json"
+    try:
+        parsed = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+    quality = parsed.get("quality", {})
+    return {
+        "document_type": quality.get("document_type", "digital"),
+        "ocr_pages": quality.get("ocr_pages", []),
+        "review": {page["page_number"]: page["warnings"]
+                   for page in parsed.get("pages", []) if page["warnings"]},
+    }
+
+
+def processing_message(status: str, document_id: str | None) -> str:
+    """One sentence for the user about how a file was processed."""
+    summary = parse_summary(document_id) if document_id else {}
+    if status == "CHUNKED":
+        ocr_pages = len(summary.get("ocr_pages", []))
+        kind = summary.get("document_type", "digital")
+        if kind == "scanned":
+            return f"Ready. Scanned document: read {ocr_pages} page(s) with OCR."
+        if kind == "mixed":
+            return (f"Ready. Mixed document: OCR used on {ocr_pages} "
+                    "page(s) with scanned content.")
+        return "Ready."
+    if status == "NEEDS_REVIEW":
+        reasons = []
+        for page, warnings in sorted(summary.get("review", {}).items()):
+            for warning in warnings:
+                key = warning.split(":")[0].split(" (")[0]
+                if key.startswith("table_"):
+                    key = "table_extraction_failed"
+                reasons.append(f"page {page}: "
+                               f"{REVIEW_REASONS.get(key, warning)}")
+        detail = "; ".join(reasons[:3]) or "some pages could not be read"
+        return f"Not searchable: {detail}."
+    if status == "FAILED":
+        return "Processing failed; the file is not searchable."
+    return status
+
+
+def add_to_library(
+    file_path: Path,
+    db_path: Path | None = None,
+    count_tokens=None,
+) -> dict:
+    """Add a file to the library now, without the watcher (e.g. from the UI).
+
+    The file is processed from a staging folder rather than the inbox, so
+    a running watcher never processes it a second time. CHUNKED files go
+    to the archive; NEEDS_REVIEW and FAILED ones to documents/, the same
+    place the watcher leaves them.
+    """
+    file_path = Path(file_path)
+    db_path = db_path or config.DB_PATH
+    if file_path.suffix.lower() not in config.SUPPORTED_EXTENSIONS:
+        raise ValueError(f"Unsupported file type: {file_path.name}")
+
+    initialize_registry(db_path)
+    initialize_chunk_storage(db_path)
+
+    staging = config.UPLOADS_DIR / "library"
+    staging.mkdir(parents=True, exist_ok=True)
+    staged = staging / file_path.name
+    if file_path.resolve() != staged.resolve():
+        shutil.copy2(file_path, staged)
+
+    try:
+        result, _ = register_document(db_path, staged, file_checksum(staged))
+        if result == "duplicate_content":
+            return {"status": "DUPLICATE", "filename": staged.name,
+                    "message": "The library already has a file with the "
+                               "same contents under another name."}
+
+        record = get_latest_document(db_path, staged.name)
+        status = record["status"]
+        if status == "CHUNKED" and current_file(record):
+            return {"status": "CHUNKED", "filename": staged.name,
+                    "message": "Already in the library."}
+
+        if status != "CHUNKED":
+            if count_tokens is None:
+                from ..tokens import get_token_counter
+                count_tokens = get_token_counter(config.EMBEDDING_MODEL)
+            status = process_document(staged, record, count_tokens,
+                                      db_path, config.PARSED_DIR)
+
+        message = processing_message(status, record["document_id"])
+        if status == "CHUNKED":
+            archive_document(db_path, record, staged)
+            message = message.replace(
+                "Ready.", f"Added as version {record['version']}.")
+        else:
+            config.DOCUMENTS_DIR.mkdir(parents=True, exist_ok=True)
+            shutil.move(str(staged), config.DOCUMENTS_DIR / staged.name)
+            message += " Left in documents/ for review."
+        return {"status": status, "filename": staged.name,
+                "message": message}
+    finally:
+        staged.unlink(missing_ok=True)
 
 
 def find_library_document(db_path: Path, path: Path) -> dict | None:
@@ -224,6 +344,8 @@ def list_library(db_path: Path) -> list[dict]:
         location = current_file(record)
         rows.append({
             **record,
+            "document_type": parse_summary(record["document_id"]).get(
+                "document_type", ""),
             "chunks": counts.get(record["document_id"], 0),
             "location": (
                 str(location.relative_to(config.PROJECT_ROOT))

@@ -76,3 +76,27 @@ QA_TOP_K = 5
 # deleted with everything derived from them when the session ends, or
 # after this many hours without activity.
 SESSION_IDLE_HOURS = float(os.environ.get("DOCINTEL_SESSION_IDLE_HOURS", "24"))
+
+# OCR for scanned pages. Each page is classified first (see
+# parsing/page_analysis.py); only scanned pages and image regions on
+# mixed pages are sent to OCR.
+#   DOCINTEL_OCR_ENGINE = easyocr | docling | none
+# easyocr reads text lines (lighter). docling also recovers table
+# structure from scans (heavier; downloads layout and table models on
+# first use). none leaves scanned pages unread (flagged NEEDS_REVIEW).
+OCR_ENGINE = os.environ.get("DOCINTEL_OCR_ENGINE", "easyocr").lower()
+OCR_LANGUAGES = os.environ.get("DOCINTEL_OCR_LANGUAGES", "en").split(",")
+# EasyOCR on the GPU (CUDA, or Apple's MPS): faster, but on an 8 GB Mac
+# the GPU shares memory with the embedding model and Ollama.
+OCR_GPU = os.environ.get("DOCINTEL_OCR_GPU", "0").lower() in {"1", "true", "yes"}
+# Render resolution for OCR. 200 dpi reads normal print well and keeps
+# an A4 page around 1650 x 2340 pixels (memory-friendly on 8 GB).
+OCR_DPI = int(os.environ.get("DOCINTEL_OCR_DPI", "200"))
+# OCR lines below this confidence are dropped as likely noise.
+OCR_MIN_LINE_CONFIDENCE = 0.3
+# A scanned page whose kept lines average below this is flagged for
+# review instead of being indexed silently.
+OCR_MIN_PAGE_CONFIDENCE = 0.5
+# Images covering at least this share of a page that has text elsewhere
+# are OCR'd as regions (screenshots, pasted scans, photographed tables).
+OCR_MIN_REGION_FRACTION = 0.10

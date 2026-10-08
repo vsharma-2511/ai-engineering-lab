@@ -1,0 +1,265 @@
+{
+ "source": "User's docintel_test_document.pdf page 3 (scanned vendor table), EasyOCR 1.7.2 at 200 dpi; bboxes in PDF points",
+ "segments": [
+  {
+   "bbox": [
+    45.7,
+    50.4,
+    498.2,
+    78.5
+   ],
+   "text": "Appendix A: Signed Vendor Agreement Summary",
+   "confidence": 0.777
+  },
+  {
+   "bbox": [
+    46.4,
+    87.8,
+    484.9,
+    112.0
+   ],
+   "text": "This appendix summarizes the three vendor contracts renewed in FY2025.",
+   "confidence": 0.847
+  },
+  {
+   "bbox": [
+    47.5,
+    112.0,
+    164.5,
+    129.6
+   ],
+   "text": "The original signed",
+   "confidence": 0.925
+  },
+  {
+   "bbox": [
+    203.8,
+    108.4,
+    476.6,
+    126.7
+   ],
+   "text": "are held by the Finance department and were",
+   "confidence": 0.774
+  },
+  {
+   "bbox": [
+    46.4,
+    128.5,
+    346.7,
+    150.1
+   ],
+   "text": "scanned for archival purposes on 14 January 2026.",
+   "confidence": 0.77
+  },
+  {
+   "bbox": [
+    48.6,
+    163.8,
+    477.7,
+    186.5
+   ],
+   "text": "All amounts are annual commitments in USD, excluding applicable taxes_",
+   "confidence": 0.844
+  },
+  {
+   "bbox": [
+    55.1,
+    211.3,
+    102.6,
+    224.3
+   ],
+   "text": "Vendor",
+   "confidence": 0.679
+  },
+  {
+   "bbox": [
+    226.4,
+    208.4,
+    276.8,
+    222.1
+   ],
+   "text": "Service",
+   "confidence": 0.824
+  },
+  {
+   "bbox": [
+    365.8,
+    205.9,
+    447.5,
+    220.3
+   ],
+   "text": "Annual Cost",
+   "confidence": 0.733
+  },
+  {
+   "bbox": [
+    480.6,
+    205.6,
+    516.6,
+    218.5
+   ],
+   "text": "Term",
+   "confidence": 0.972
+  },
+  {
+   "bbox": [
+    54.0,
+    238.0,
+    138.6,
+    252.7
+   ],
+   "text": "Cloudline Inc:",
+   "confidence": 0.827
+  },
+  {
+   "bbox": [
+    226.1,
+    234.4,
+    276.8,
+    252.0
+   ],
+   "text": "Hosting",
+   "confidence": 0.987
+  },
+  {
+   "bbox": [
+    366.1,
+    233.6,
+    435.2,
+    247.7
+   ],
+   "text": "$1,240,000",
+   "confidence": 0.758
+  },
+  {
+   "bbox": [
+    481.3,
+    232.9,
+    527.0,
+    248.4
+   ],
+   "text": "3 years",
+   "confidence": 1.0
+  },
+  {
+   "bbox": [
+    54.4,
+    266.8,
+    127.8,
+    279.7
+   ],
+   "text": "DataHarbor",
+   "confidence": 0.582
+  },
+  {
+   "bbox": [
+    227.2,
+    263.2,
+    274.3,
+    279.0
+   ],
+   "text": "Backup",
+   "confidence": 0.906
+  },
+  {
+   "bbox": [
+    365.8,
+    261.4,
+    424.4,
+    276.8
+   ],
+   "text": "$185,000",
+   "confidence": 0.635
+  },
+  {
+   "bbox": [
+    482.0,
+    261.0,
+    527.4,
+    276.1
+   ],
+   "text": "2 years",
+   "confidence": 0.719
+  },
+  {
+   "bbox": [
+    55.1,
+    294.8,
+    126.4,
+    307.8
+   ],
+   "text": "SecureGate",
+   "confidence": 1.0
+  },
+  {
+   "bbox": [
+    227.5,
+    290.5,
+    313.6,
+    306.4
+   ],
+   "text": "Security audit",
+   "confidence": 0.751
+  },
+  {
+   "bbox": [
+    366.8,
+    289.8,
+    418.0,
+    304.2
+   ],
+   "text": "$96,500",
+   "confidence": 0.609
+  },
+  {
+   "bbox": [
+    482.8,
+    289.8,
+    522.4,
+    303.5
+   ],
+   "text": "1 year",
+   "confidence": 0.673
+  },
+  {
+   "bbox": [
+    142.2,
+    340.2,
+    207.0,
+    356.0
+   ],
+   "text": "M. Chen",
+   "confidence": 0.589
+  },
+  {
+   "bbox": [
+    272.9,
+    347.4,
+    307.4,
+    360.4
+   ],
+   "text": "Date:",
+   "confidence": 0.999
+  },
+  {
+   "bbox": [
+    50.4,
+    349.9,
+    132.1,
+    365.4
+   ],
+   "text": "Approved by:",
+   "confidence": 0.969
+  },
+  {
+   "bbox": [
+    163.8,
+    110.9,
+    205.2,
+    129.3
+   ],
+   "text": "copies",
+   "confidence": 0.854
+  }
+ ]
+}

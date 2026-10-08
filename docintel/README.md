@@ -10,7 +10,9 @@ and answered from with verified page citations.
 ```
 documents/*.pdf            (inbox; processed PDFs move to archive/)
   -> ingestion/watcher      register (checksum + version) in data/registry.db
-  -> parsing/pdf_parser     text blocks + tables (PyMuPDF), header/footer removal
+  -> parsing/page_analysis  each page: text, scanned, mixed or blank
+  -> parsing/pdf_parser     text blocks + tables (PyMuPDF, or OCR for scans),
+                            header/footer removal
   -> chunking/pipeline      text chunks + table chunks, lossless-coverage checks
   -> chunks table           data/registry.db
   -> embeddings             all-MiniLM-L6-v2, cached in chunk_vectors table
@@ -25,6 +27,30 @@ which number answers which question:
 Table 3. Program participation, 2025
 Program: Digital skills | Location: East | Participants: 85 | Completion rate: 76%
 ```
+
+## Chat interface
+
+```bash
+pip install -e ".[ui]"
+python -m streamlit run app.py
+```
+
+This opens http://localhost:8501 with two pages:
+
+- **Chat**: ask questions and get answers with citation cards (file,
+  page and the exact quote). Upload PDFs in the sidebar to chat about
+  them only. They stay private to the chat and are deleted when you
+  click **End chat**. Choose whether to search this chat's files or the
+  library. Follow-ups like "and at Central?" are rewritten into full
+  questions using the conversation, and the answer shows what was
+  searched. That costs one extra model call per follow-up and can be
+  turned off under **Model and settings**.
+- **Library**: see every document with its version, status and chunk
+  count, add PDFs (processed immediately, no watcher needed), and remove
+  documents with all their data.
+
+Start Ollama first for the default local model. With a local 4B model,
+expect roughly 20 to 60 seconds per answer, and more for follow-ups.
 
 ## Setup
 
@@ -137,6 +163,44 @@ Set `DOCINTEL_HOME` to use a different project folder.
 chunk must contain, grouped by scenario (table cell lookup, distractor
 column, year headers, notes, narrative text, definitions, trends,
 unanswerable). Add cases whenever you add documents.
+
+## Scanned and mixed PDFs (OCR)
+
+```bash
+pip install -e ".[ocr]"         # EasyOCR (default engine)
+pip install -e ".[docling]"     # optional: Docling engine
+```
+
+Every page is classified before it is read:
+
+| Page | What it has | How it is read |
+|---|---|---|
+| text | a text layer | PyMuPDF (exact, fast) |
+| scanned | images or drawn outlines but no text layer | OCR of the whole page |
+| mixed | a text layer plus large images without text over them | text layer, plus OCR of just those images |
+| blank | nothing | nothing to read |
+
+The document is then **digital**, **scanned** or **mixed**, as shown in
+the Library page and upload messages. OCR output has the same shape as
+text-layer output (text blocks and tables with positions), so chunking,
+search and citations work the same for scanned pages. Each block records
+its `source` (`text_layer` or `ocr`) in the parsed JSON.
+
+- **EasyOCR** (`DOCINTEL_OCR_ENGINE=easyocr`, the default). Pages are
+  rendered at 200 dpi and contrast-stretched with Pillow before
+  reading. Lines whose pieces align in columns are rebuilt into tables,
+  so scanned tables still read as `Location: East | Participants: 85`.
+  Takes about 20 to 30 s per page on an M2; models (~100 MB) download on
+  first use.
+- **Docling** (`DOCINTEL_OCR_ENGINE=docling`). Uses layout and table
+  models with EasyOCR inside. It is heavier, with cleaner punctuation
+  but not always better tables.
+- `DOCINTEL_OCR_ENGINE=none` turns OCR off. Scanned pages are then
+  flagged `NEEDS_REVIEW`.
+
+A scanned page where OCR finds nothing, or reads it with low confidence
+(below 0.5), is flagged `NEEDS_REVIEW` rather than indexed silently.
+Upload messages say why, in plain words.
 
 ## Document library and chat sessions
 
