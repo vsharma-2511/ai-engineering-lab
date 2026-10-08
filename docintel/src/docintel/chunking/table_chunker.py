@@ -80,6 +80,13 @@ def render_row(row: list, column_names: list[str] | None) -> str:
 def find_table_notes(page: dict, table: dict) -> list[dict]:
     table_bottom = table["bbox"][3]
     notes = []
+    # Notes below the next table belong to that table. (Text-layer tables
+    # also stop at their INSIDE_TABLE blocks; OCR'd tables have none.)
+    next_table_top = min(
+        (other["bbox"][1] for other in page.get("tables", [])
+         if other is not table and other["bbox"][1] >= table_bottom),
+        default=float("inf"),
+    )
 
     blocks = sorted(
         page["text_blocks"],
@@ -89,6 +96,8 @@ def find_table_notes(page: dict, table: dict) -> list[dict]:
     for block in blocks:
         if block["bbox"][1] < table_bottom:
             continue
+        if block["bbox"][1] >= next_table_top:
+            break
 
         text = block["text"].strip()
 

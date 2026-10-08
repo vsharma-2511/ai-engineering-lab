@@ -1,0 +1,465 @@
+{
+ "source": "Scanned_Test.pdf page 1 (DocIntel test PDF rendered at 150 dpi, OCR'd at 200 dpi with EasyOCR 1.7.2); bboxes in PDF points",
+ "segments": [
+  {
+   "bbox": [
+    148.68,
+    56.52,
+    464.76,
+    80.28
+   ],
+   "text": "Doclntel Parsing Test: Text and Tables",
+   "confidence": 0.7589
+  },
+  {
+   "bbox": [
+    59.04,
+    92.16,
+    356.4,
+    102.96
+   ],
+   "text": "Synthetic sample data for testing PDF extraction. All names and values are fictional_",
+   "confidence": 0.7159
+  },
+  {
+   "bbox": [
+    59.4,
+    114.84,
+    186.12,
+    130.32
+   ],
+   "text": "1. City service overview",
+   "confidence": 0.863
+  },
+  {
+   "bbox": [
+    59.4,
+    136.44,
+    533.88,
+    151.2
+   ],
+   "text": "Northport expanded its library services between 2023 and 2025. The table below reports annual visits and active",
+   "confidence": 0.6963
+  },
+  {
+   "bbox": [
+    58.68,
+    151.56,
+    516.6,
+    164.52
+   ],
+   "text": "memberships. Visits are counted at the entrance; memberships count people with an active card at year end_",
+   "confidence": 0.7487
+  },
+  {
+   "bbox": [
+    58.68,
+    177.12,
+    228.6,
+    192.96
+   ],
+   "text": "Table 1. Northport library usage",
+   "confidence": 0.8383
+  },
+  {
+   "bbox": [
+    66.96,
+    206.64,
+    87.84,
+    216.0
+   ],
+   "text": "Year",
+   "confidence": 1.0
+  },
+  {
+   "bbox": [
+    146.16,
+    205.56,
+    253.44,
+    217.44
+   ],
+   "text": "Library visits (thousands)",
+   "confidence": 0.7563
+  },
+  {
+   "bbox": [
+    343.44,
+    205.92,
+    462.24,
+    217.44
+   ],
+   "text": "Active members (thousands)",
+   "confidence": 0.9964
+  },
+  {
+   "bbox": [
+    66.96,
+    231.84,
+    88.56,
+    241.92
+   ],
+   "text": "2023",
+   "confidence": 1.0
+  },
+  {
+   "bbox": [
+    146.88,
+    231.84,
+    163.44,
+    241.2
+   ],
+   "text": "412",
+   "confidence": 1.0
+  },
+  {
+   "bbox": [
+    342.72,
+    231.84,
+    354.96,
+    241.92
+   ],
+   "text": "68",
+   "confidence": 1.0
+  },
+  {
+   "bbox": [
+    66.96,
+    256.32,
+    88.56,
+    266.4
+   ],
+   "text": "2024",
+   "confidence": 1.0
+  },
+  {
+   "bbox": [
+    146.88,
+    256.32,
+    164.16,
+    267.12
+   ],
+   "text": "438",
+   "confidence": 0.6389
+  },
+  {
+   "bbox": [
+    343.44,
+    257.04,
+    353.52,
+    265.68
+   ],
+   "text": "71",
+   "confidence": 1.0
+  },
+  {
+   "bbox": [
+    66.96,
+    281.52,
+    88.56,
+    291.6
+   ],
+   "text": "2025",
+   "confidence": 1.0
+  },
+  {
+   "bbox": [
+    146.88,
+    281.52,
+    164.16,
+    291.6
+   ],
+   "text": "465",
+   "confidence": 1.0
+  },
+  {
+   "bbox": [
+    343.44,
+    281.52,
+    354.96,
+    291.6
+   ],
+   "text": "75",
+   "confidence": 1.0
+  },
+  {
+   "bbox": [
+    58.68,
+    313.92,
+    187.56,
+    327.24
+   ],
+   "text": "Interpretation: visits increased",
+   "confidence": 0.7547
+  },
+  {
+   "bbox": [
+    209.16,
+    314.28,
+    553.32,
+    327.24
+   ],
+   "text": "412 thousand in 2023 to 465 thousand in 2025. The 2025 membership count was",
+   "confidence": 0.7893
+  },
+  {
+   "bbox": [
+    59.04,
+    328.68,
+    193.68,
+    339.84
+   ],
+   "text": "75 thousand, not 465 thousand:",
+   "confidence": 0.635
+  },
+  {
+   "bbox": [
+    59.04,
+    351.36,
+    238.68,
+    362.16
+   ],
+   "text": "Note: figures are rounded to the nearest thousand_",
+   "confidence": 0.6354
+  },
+  {
+   "bbox": [
+    241.2,
+    351.36,
+    343.44,
+    361.44
+   ],
+   "text": "A visit is not a unique visitor.",
+   "confidence": 0.7603
+  },
+  {
+   "bbox": [
+    58.68,
+    387.0,
+    163.8,
+    401.4
+   ],
+   "text": "2. Budget summary",
+   "confidence": 0.9862
+  },
+  {
+   "bbox": [
+    59.4,
+    407.88,
+    445.32,
+    423.0
+   ],
+   "text": "The budget categories below use Canadian dollars in millions. Capital spending is separate",
+   "confidence": 0.8545
+  },
+  {
+   "bbox": [
+    465.84,
+    407.88,
+    553.32,
+    422.28
+   ],
+   "text": "operating spending;",
+   "confidence": 0.9947
+  },
+  {
+   "bbox": [
+    57.96,
+    421.56,
+    252.36,
+    436.68
+   ],
+   "text": "the total row is the sum of the two categories.",
+   "confidence": 0.798
+  },
+  {
+   "bbox": [
+    58.68,
+    447.84,
+    312.12,
+    463.68
+   ],
+   "text": "Table 2. Northport library budget (CAD millions)",
+   "confidence": 0.817
+  },
+  {
+   "bbox": [
+    66.24,
+    477.0,
+    105.84,
+    488.88
+   ],
+   "text": "Category",
+   "confidence": 0.5742
+  },
+  {
+   "bbox": [
+    296.64,
+    477.36,
+    318.24,
+    486.72
+   ],
+   "text": "2024",
+   "confidence": 1.0
+  },
+  {
+   "bbox": [
+    417.6,
+    477.36,
+    439.2,
+    486.72
+   ],
+   "text": "2025",
+   "confidence": 0.7805
+  },
+  {
+   "bbox": [
+    66.24,
+    501.84,
+    106.92,
+    515.16
+   ],
+   "text": "Operating",
+   "confidence": 1.0
+  },
+  {
+   "bbox": [
+    296.64,
+    503.28,
+    310.32,
+    511.92
+   ],
+   "text": "8.4",
+   "confidence": 0.8735
+  },
+  {
+   "bbox": [
+    417.6,
+    503.28,
+    431.28,
+    511.92
+   ],
+   "text": "9.1",
+   "confidence": 0.6714
+  },
+  {
+   "bbox": [
+    66.96,
+    527.76,
+    96.48,
+    539.28
+   ],
+   "text": "Capital",
+   "confidence": 0.9235
+  },
+  {
+   "bbox": [
+    297.36,
+    527.76,
+    311.04,
+    537.12
+   ],
+   "text": "1.2",
+   "confidence": 0.7238
+  },
+  {
+   "bbox": [
+    418.32,
+    527.76,
+    432.0,
+    537.12
+   ],
+   "text": "1.8",
+   "confidence": 0.7942
+  },
+  {
+   "bbox": [
+    66.96,
+    552.24,
+    88.56,
+    562.32
+   ],
+   "text": "Total",
+   "confidence": 1.0
+  },
+  {
+   "bbox": [
+    296.64,
+    552.96,
+    311.04,
+    562.32
+   ],
+   "text": "9.6",
+   "confidence": 1.0
+  },
+  {
+   "bbox": [
+    418.32,
+    552.96,
+    436.32,
+    562.32
+   ],
+   "text": "10.9",
+   "confidence": 1.0
+  },
+  {
+   "bbox": [
+    58.68,
+    582.12,
+    410.04,
+    595.44
+   ],
+   "text": "Footnote: the 2025 capital amount includes a one-time building repair allocation of CAD 0.6 million.",
+   "confidence": 0.7745
+  },
+  {
+   "bbox": [
+    53.28,
+    749.52,
+    137.52,
+    758.88
+   ],
+   "text": "DocIntel test document",
+   "confidence": 0.9278
+  },
+  {
+   "bbox": [
+    140.76,
+    748.8,
+    192.96,
+    759.6
+   ],
+   "text": "synthetic data",
+   "confidence": 0.9766
+  },
+  {
+   "bbox": [
+    531.0,
+    749.16,
+    558.0,
+    759.96
+   ],
+   "text": "Page 1",
+   "confidence": 0.9999
+  },
+  {
+   "bbox": [
+    186.17,
+    313.98,
+    209.47,
+    326.82
+   ],
+   "text": "from",
+   "confidence": 1.0
+  },
+  {
+   "bbox": [
+    443.22,
+    407.93,
+    467.22,
+    421.87
+   ],
+   "text": "from",
+   "confidence": 1.0
+  }
+ ]
+}

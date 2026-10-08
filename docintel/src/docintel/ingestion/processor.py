@@ -71,6 +71,7 @@ def process_document(
 
         print(
             f"CHUNKED: {path.name} | "
+            f"type={parsed['quality']['document_type']} | "
             f"pages={parsed['quality']['total_pages']} | "
             f"chunks={len(chunks)}{warning} | result={output_path}",
             flush=True,

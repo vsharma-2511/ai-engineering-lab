@@ -1,0 +1,16 @@
+# Streamlit settings for app.py (read when run from this folder).
+[client]
+toolbarMode = "minimal"   # hide "Deploy"; this is a local app
+
+[browser]
+gatherUsageStats = false
+
+[theme]
+primaryColor = "#4263eb"
+
+[server]
+# Streamlit's file watcher inspects every imported module to decide what
+# to watch. With transformers loaded, that inspection imports image
+# models needing torchvision (not installed, not needed) and floods the
+# terminal with harmless tracebacks. Restart the app after code changes.
+fileWatcherType = "none"

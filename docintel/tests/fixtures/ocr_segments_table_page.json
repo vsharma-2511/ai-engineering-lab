@@ -1,0 +1,375 @@
+{
+ "source": "Scanned_Test.pdf page 2 (DocIntel test PDF rendered at 150 dpi, OCR'd at 200 dpi with EasyOCR 1.7.2); bboxes in PDF points",
+ "segments": [
+  {
+   "bbox": [
+    171.0,
+    56.88,
+    442.44,
+    80.28
+   ],
+   "text": "DocIntel Parsing Test: Continued",
+   "confidence": 0.9747
+  },
+  {
+   "bbox": [
+    59.04,
+    94.32,
+    69.84,
+    104.4
+   ],
+   "text": "3.",
+   "confidence": 0.8997
+  },
+  {
+   "bbox": [
+    70.56,
+    92.88,
+    158.76,
+    108.36
+   ],
+   "text": "Program results",
+   "confidence": 0.9997
+  },
+  {
+   "bbox": [
+    58.68,
+    113.04,
+    545.4,
+    128.16
+   ],
+   "text": "The following table reports participation by program and location: Each row combines a program, a location, and its",
+   "confidence": 0.6013
+  },
+  {
+   "bbox": [
+    58.32,
+    128.16,
+    244.44,
+    141.48
+   ],
+   "text": "participant count: Counts refer to 2025 only:",
+   "confidence": 0.8277
+  },
+  {
+   "bbox": [
+    58.68,
+    154.8,
+    250.92,
+    170.28
+   ],
+   "text": "Table 3. Program participation; 2025",
+   "confidence": 0.6859
+  },
+  {
+   "bbox": [
+    66.6,
+    183.24,
+    103.68,
+    195.12
+   ],
+   "text": "Program",
+   "confidence": 0.8172
+  },
+  {
+   "bbox": [
+    201.6,
+    183.6,
+    239.76,
+    192.96
+   ],
+   "text": "Location",
+   "confidence": 0.8521
+  },
+  {
+   "bbox": [
+    311.76,
+    183.6,
+    362.88,
+    194.4
+   ],
+   "text": "Participants",
+   "confidence": 0.9114
+  },
+  {
+   "bbox": [
+    416.88,
+    183.6,
+    483.84,
+    194.4
+   ],
+   "text": "Completion rate",
+   "confidence": 0.6619
+  },
+  {
+   "bbox": [
+    66.24,
+    207.36,
+    114.12,
+    221.04
+   ],
+   "text": "Digital skills",
+   "confidence": 0.9995
+  },
+  {
+   "bbox": [
+    202.32,
+    208.08,
+    231.84,
+    218.16
+   ],
+   "text": "Central",
+   "confidence": 1.0
+  },
+  {
+   "bbox": [
+    311.76,
+    208.8,
+    328.32,
+    218.16
+   ],
+   "text": "120",
+   "confidence": 0.9027
+  },
+  {
+   "bbox": [
+    416.88,
+    208.8,
+    436.32,
+    218.16
+   ],
+   "text": "82%",
+   "confidence": 0.6002
+  },
+  {
+   "bbox": [
+    66.96,
+    233.28,
+    113.76,
+    244.8
+   ],
+   "text": "Digital skills",
+   "confidence": 0.7143
+  },
+  {
+   "bbox": [
+    202.32,
+    233.28,
+    221.76,
+    243.36
+   ],
+   "text": "East",
+   "confidence": 0.9999
+  },
+  {
+   "bbox": [
+    311.76,
+    234.0,
+    324.0,
+    243.36
+   ],
+   "text": "85",
+   "confidence": 1.0
+  },
+  {
+   "bbox": [
+    416.88,
+    233.28,
+    436.32,
+    243.36
+   ],
+   "text": "76%",
+   "confidence": 0.9101
+  },
+  {
+   "bbox": [
+    66.6,
+    256.68,
+    138.6,
+    270.0
+   ],
+   "text": "Career workshops",
+   "confidence": 0.9994
+  },
+  {
+   "bbox": [
+    201.96,
+    258.12,
+    231.84,
+    268.56
+   ],
+   "text": "Central",
+   "confidence": 0.7244
+  },
+  {
+   "bbox": [
+    311.76,
+    258.48,
+    324.0,
+    268.56
+   ],
+   "text": "64",
+   "confidence": 1.0
+  },
+  {
+   "bbox": [
+    416.88,
+    258.48,
+    436.32,
+    267.84
+   ],
+   "text": "91%",
+   "confidence": 0.9995
+  },
+  {
+   "bbox": [
+    66.6,
+    281.88,
+    138.6,
+    295.2
+   ],
+   "text": "Career workshops",
+   "confidence": 0.6393
+  },
+  {
+   "bbox": [
+    202.32,
+    283.68,
+    221.76,
+    293.04
+   ],
+   "text": "East",
+   "confidence": 1.0
+  },
+  {
+   "bbox": [
+    311.76,
+    283.68,
+    323.28,
+    293.04
+   ],
+   "text": "48",
+   "confidence": 1.0
+  },
+  {
+   "bbox": [
+    416.88,
+    283.68,
+    436.32,
+    293.04
+   ],
+   "text": "88%",
+   "confidence": 0.9922
+  },
+  {
+   "bbox": [
+    58.32,
+    315.72,
+    160.92,
+    329.4
+   ],
+   "text": "Example question: How",
+   "confidence": 0.9129
+  },
+  {
+   "bbox": [
+    186.84,
+    315.72,
+    537.48,
+    330.12
+   ],
+   "text": "people joined Digital skills at the East location? The correct answer is 85. The 76%",
+   "confidence": 0.7442
+  },
+  {
+   "bbox": [
+    57.96,
+    329.76,
+    355.32,
+    343.8
+   ],
+   "text": "figure in the same row is the completion rate, not the participant count.",
+   "confidence": 0.8302
+  },
+  {
+   "bbox": [
+    59.76,
+    357.84,
+    196.56,
+    369.36
+   ],
+   "text": "4. Definitions and caveats",
+   "confidence": 0.9444
+  },
+  {
+   "bbox": [
+    58.68,
+    377.28,
+    545.4,
+    392.04
+   ],
+   "text": "Completion rate is the percentage of enrolled participants who attended the final session. It is calculated separately",
+   "confidence": 0.7266
+  },
+  {
+   "bbox": [
+    57.96,
+    392.04,
+    432.36,
+    405.72
+   ],
+   "text": "for each program and location: The figures should not be added across percentage cells.",
+   "confidence": 0.5454
+  },
+  {
+   "bbox": [
+    59.04,
+    414.36,
+    383.76,
+    425.88
+   ],
+   "text": "Source: Fictional Northport Service Office, DocIntel test dataset, prepared September 2026",
+   "confidence": 0.6085
+  },
+  {
+   "bbox": [
+    53.28,
+    749.52,
+    137.52,
+    758.88
+   ],
+   "text": "DocIntel test document",
+   "confidence": 0.9278
+  },
+  {
+   "bbox": [
+    140.76,
+    748.8,
+    192.96,
+    759.6
+   ],
+   "text": "synthetic data",
+   "confidence": 0.9766
+  },
+  {
+   "bbox": [
+    531.0,
+    749.16,
+    559.44,
+    759.96
+   ],
+   "text": "Page 2",
+   "confidence": 0.9999
+  },
+  {
+   "bbox": [
+    160.23,
+    315.4,
+    187.17,
+    329.72
+   ],
+   "text": "many",
+   "confidence": 0.9944
+  }
+ ]
+}

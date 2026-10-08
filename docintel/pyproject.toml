@@ -21,6 +21,11 @@ gemini = ["google-genai>=2.0"]
 openai = ["openai>=3.0"]
 claude = ["anthropic>=1.0"]
 llm = ["google-genai>=2.0", "openai>=3.0", "anthropic>=1.0"]
+# The chat interface (streamlit run app.py).
+ui = ["streamlit>=1.50"]
+# OCR for scanned pages: EasyOCR (default engine) or Docling (tables).
+ocr = ["easyocr>=1.7", "pillow>=10"]
+docling = ["docling>=2.100"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
